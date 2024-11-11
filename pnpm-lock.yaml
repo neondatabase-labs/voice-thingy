@@ -6,43 +6,16 @@ settings:
 
 importers:
   .:
-    devDependencies:
+    dependencies:
       '@openai/realtime-api-beta':
         specifier: github:openai/openai-realtime-api-beta
         version: https://codeload.github.com/openai/openai-realtime-api-beta/tar.gz/a5cb94824f625423858ebacb9f769226ca98945f
-      '@types/node':
-        specifier: 22.9.0
-        version: 22.9.0
-      '@types/react':
-        specifier: 18.3.12
-        version: 18.3.12
-      '@types/react-no-ssr':
-        specifier: ^1.1.7
-        version: 1.1.7
-      '@types/ws':
-        specifier: ^8.5.13
-        version: 8.5.13
-      autoprefixer:
-        specifier: ^9.8.8
-        version: 9.8.8
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
       next:
         specifier: 15.0.3
         version: 15.0.3(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
-      postcss:
-        specifier: ^8
-        version: 8.4.49
-      prettier:
-        specifier: ^3.3.3
-        version: 3.3.3
-      prettier-plugin-organize-imports:
-        specifier: ^4.1.0
-        version: 4.1.0(prettier@3.3.3)(typescript@5.6.3)
-      prettier-plugin-tailwindcss:
-        specifier: ^0.6.8
-        version: 0.6.8(prettier-plugin-organize-imports@4.1.0(prettier@3.3.3)(typescript@5.6.3))(prettier@3.3.3)
       react:
         specifier: 19.0.0-rc-66855b96-20241106
         version: 19.0.0-rc-66855b96-20241106
@@ -58,6 +31,37 @@ importers:
       save:
         specifier: ^2.9.0
         version: 2.9.0
+      ws:
+        specifier: ^8.18.0
+        version: 8.18.0
+    devDependencies:
+      '@types/node':
+        specifier: 22.9.0
+        version: 22.9.0
+      '@types/react':
+        specifier: 18.3.12
+        version: 18.3.12
+      '@types/react-no-ssr':
+        specifier: ^1.1.7
+        version: 1.1.7
+      '@types/ws':
+        specifier: ^8.5.13
+        version: 8.5.13
+      autoprefixer:
+        specifier: ^9.8.8
+        version: 9.8.8
+      postcss:
+        specifier: ^8
+        version: 8.4.49
+      prettier:
+        specifier: ^3.3.3
+        version: 3.3.3
+      prettier-plugin-organize-imports:
+        specifier: ^4.1.0
+        version: 4.1.0(prettier@3.3.3)(typescript@5.6.3)
+      prettier-plugin-tailwindcss:
+        specifier: ^0.6.8
+        version: 0.6.8(prettier-plugin-organize-imports@4.1.0(prettier@3.3.3)(typescript@5.6.3))(prettier@3.3.3)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.14
@@ -67,9 +71,6 @@ importers:
       typescript:
         specifier: ^5
         version: 5.6.3
-      ws:
-        specifier: ^8.18.0
-        version: 8.18.0
 
 packages:
   '@alloc/quick-lru@5.2.0':
