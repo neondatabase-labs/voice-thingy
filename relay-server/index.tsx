@@ -6,5 +6,4 @@ if (!OPENAI_API_KEY) throw new Error('Environment variable OPENAI_API_KEY is req
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8081
 
-const relay = new RealtimeRelay(OPENAI_API_KEY)
-relay.listen(PORT)
+new RealtimeRelay(OPENAI_API_KEY).listen(PORT)
