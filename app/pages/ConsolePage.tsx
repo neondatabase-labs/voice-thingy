@@ -267,13 +267,11 @@ export function ConsolePage() {
    */
   useEffect(() => {
     let isLoaded = true
-
     const wavRecorder = wavRecorderRef.current
     const clientCanvas = clientCanvasRef.current
-    let clientCtx: CanvasRenderingContext2D | null = null
-
-    const wavStreamPlayer = wavStreamPlayerRef.current
     const serverCanvas = serverCanvasRef.current
+    const wavStreamPlayer = wavStreamPlayerRef.current
+    let clientCtx: CanvasRenderingContext2D | null = null
     let serverCtx: CanvasRenderingContext2D | null = null
 
     const render = () => {
@@ -306,7 +304,6 @@ export function ConsolePage() {
       }
     }
     render()
-
     return () => {
       isLoaded = false
     }
@@ -401,9 +398,8 @@ export function ConsolePage() {
           // if we receive multiple events in a row, aggregate them for display purposes
           lastEvent.count = (lastEvent.count || 0) + 1
           return realtimeEvents.slice(0, -1).concat(lastEvent)
-        } else {
-          return realtimeEvents.concat(realtimeEvent)
         }
+        return realtimeEvents.concat(realtimeEvent)
       })
     })
     client.on('error', (event: any) => console.error(event))
@@ -434,9 +430,7 @@ export function ConsolePage() {
    */
   return (
     <>
-      <div>
-        {!LOCAL_RELAY_SERVER_URL && <Button icon={Edit} iconPosition="end" buttonStyle="flush" label={`api key: ${apiKey.slice(0, 3)}...`} onClick={() => resetAPIKey()} />}
-      </div>
+      <div>{!LOCAL_RELAY_SERVER_URL && <Button icon={Edit} label={`api key: ${apiKey.slice(0, 3)}...`} onClick={() => resetAPIKey()} />}</div>
       <div>
         <div>
           <div>
