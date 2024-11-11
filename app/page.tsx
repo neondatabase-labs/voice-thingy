@@ -1,7 +1,7 @@
 'use client'
 
+import { ConsolePage } from '@/components/ConsolePage'
 import NoSSR from 'react-no-ssr'
-import { ConsolePage } from './pages/ConsolePage'
 
 export default function () {
   return (

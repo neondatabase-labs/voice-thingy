@@ -4,17 +4,17 @@ import React from 'react'
 import { Icon } from 'react-feather'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  label?: string
   icon?: Icon
+  label?: string
+  iconFill?: boolean
   iconPosition?: 'start' | 'end'
   iconColor?: 'red' | 'green' | 'grey'
-  iconFill?: boolean
   buttonStyle?: 'regular' | 'action' | 'alert' | 'flush'
 }
 
-export function Button({ label = 'Okay', icon = void 0, iconPosition = 'start', iconColor = void 0, iconFill = false, buttonStyle = 'regular', ...rest }: ButtonProps) {
-  const StartIcon = iconPosition === 'start' ? icon : null
+export default function ({ label = 'Okay', icon = void 0, iconPosition = 'start', iconColor = void 0, iconFill = false, buttonStyle = 'regular', ...rest }: ButtonProps) {
   const EndIcon = iconPosition === 'end' ? icon : null
+  const StartIcon = iconPosition === 'start' ? icon : null
   return (
     <button {...rest}>
       {StartIcon && (

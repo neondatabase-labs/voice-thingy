@@ -1,7 +1,7 @@
 import { RealtimeClient } from '@openai/realtime-api-beta'
 import { WebSocketServer } from 'ws'
 
-export class RealtimeRelay {
+export default class RealtimeRelay {
   wss: any
   apiKey: any
   sockets: any
@@ -80,5 +80,3 @@ export class RealtimeRelay {
     console.log(`[RealtimeRelay]`, ...args)
   }
 }
-
-exports.RealtimeRelay = RealtimeRelay

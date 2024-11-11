@@ -2,21 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-export function Toggle({
-  defaultValue = false,
+export default function ({
   values,
   labels,
   onChange = () => {},
+  defaultValue = false,
 }: {
-  defaultValue?: string | boolean
   values?: string[]
   labels?: string[]
+  defaultValue?: string | boolean
   onChange?: (isEnabled: boolean, value: string) => void
 }) {
   if (typeof defaultValue === 'string') defaultValue = !!Math.max(0, (values || []).indexOf(defaultValue))
+  const bgRef = useRef<HTMLDivElement>(null)
   const leftRef = useRef<HTMLDivElement>(null)
   const rightRef = useRef<HTMLDivElement>(null)
-  const bgRef = useRef<HTMLDivElement>(null)
   const [value, setValue] = useState<boolean>(defaultValue)
 
   const toggleValue = () => {
@@ -25,10 +25,11 @@ export function Toggle({
     setValue(v)
     onChange(v, (values || [])[index])
   }
+
   useEffect(() => {
+    const bgEl = bgRef.current
     const leftEl = leftRef.current
     const rightEl = rightRef.current
-    const bgEl = bgRef.current
     if (leftEl && rightEl && bgEl) {
       if (value) {
         bgEl.style.left = rightEl.offsetLeft + 'px'
@@ -39,6 +40,7 @@ export function Toggle({
       }
     }
   }, [value])
+
   return (
     <div onClick={toggleValue}>
       {labels && <div ref={leftRef}>{labels[0]}</div>}

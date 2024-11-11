@@ -12,11 +12,10 @@
  */
 const LOCAL_RELAY_SERVER_URL: string = process.env.REACT_APP_LOCAL_RELAY_SERVER_URL || ''
 
-import { Button } from '@/components/Button'
-import { Toggle } from '@/components/Toggle'
+import Button from '@/components/Button'
+import Toggle from '@/components/Toggle'
+import { WavRenderer } from '@/components/wav_renderer'
 import { WavRecorder, WavStreamPlayer } from '@/lib/wavtools/index.js'
-import { instructions } from '@/utils/conversation_config'
-import { WavRenderer } from '@/utils/wav_renderer'
 import { RealtimeClient } from '@openai/realtime-api-beta'
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -28,7 +27,6 @@ import { ArrowDown, ArrowUp, Edit, X, Zap } from 'react-feather'
 interface Coordinates {
   lat: number
   lng: number
-  location?: string
   temperature?: {
     value: number
     units: string
@@ -37,6 +35,7 @@ interface Coordinates {
     value: number
     units: string
   }
+  location?: string
 }
 
 /**
@@ -44,10 +43,27 @@ interface Coordinates {
  */
 interface RealtimeEvent {
   time: string
-  source: 'client' | 'server'
   count?: number
+  source: 'client' | 'server'
   event: { [key: string]: any }
 }
+
+const instructions = `System settings:
+Tool use: enabled.
+
+Instructions:
+- You are an artificial intelligence agent responsible for helping test realtime voice capabilities
+- Please make sure to respond with a helpful voice via audio
+- Be kind, helpful, and curteous
+- It is okay to ask the user questions
+- Use tools and functions you have available liberally, it is part of the training apparatus
+- Be open to exploration and conversation
+- Remember: this is just for fun and testing!
+
+Personality:
+- Be upbeat and genuine
+- Try speaking quickly as if excited
+`
 
 export function ConsolePage() {
   /**
@@ -479,13 +495,13 @@ export function ConsolePage() {
               })}
             </div>
           </div>
-          <div className="conversation">
+          <div>
             <div>conversation</div>
             <div data-conversation-content>
-              {!items.length && `awaiting connection...`}
+              {!items.length && <span>awaiting connection...</span>}
               {items.map((conversationItem, i) => {
                 return (
-                  <div className="conversation-item" key={conversationItem.id}>
+                  <div key={conversationItem.id}>
                     <div className={`${conversationItem.role || ''}`}>
                       <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
                       <div onClick={() => deleteConversationItem(conversationItem.id)}>
