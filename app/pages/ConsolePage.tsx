@@ -12,8 +12,8 @@
  */
 const LOCAL_RELAY_SERVER_URL: string = process.env.REACT_APP_LOCAL_RELAY_SERVER_URL || ''
 
-import { Button } from '@/components/button/Button'
-import { Toggle } from '@/components/toggle/Toggle'
+import { Button } from '@/components/Button'
+import { Toggle } from '@/components/Toggle'
 import { WavRecorder, WavStreamPlayer } from '@/lib/wavtools/index.js'
 import { instructions } from '@/utils/conversation_config'
 import { WavRenderer } from '@/utils/wav_renderer'
