@@ -1,0 +1,52 @@
+{
+  "name": "openai-realtime-console",
+  "dependencies": {
+    "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-feather": "^2.0.10",
+    "react-scripts": "^5.0.1",
+    "save": "^2.9.0",
+    "ws": "^8.18.0"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "eject": "react-scripts eject",
+    "zip": "zip -r realtime-api-console.zip . -x 'node_modules' 'node_modules/*' 'node_modules/**' '.git' '.git/*' '.git/**' '.DS_Store' '*/.DS_Store' 'package-lock.json' '*.zip' '*.tar.gz' '*.tar' '.env'",
+    "relay": "tsx ./relay-server/index.js",
+    "fmt": "prettier --write '**/*' --ignore-unknown"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@craco/craco": "^7.1.0",
+    "@types/jest": "^27.5.2",
+    "@types/leaflet": "^1.9.12",
+    "@types/node": "^16.18.108",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^9.8.8",
+    "craco-alias": "^3.0.1",
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.7",
+    "postcss": "^7.0.39",
+    "prettier": "^3.3.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17",
+    "tsx": "^4.19.2",
+    "typescript": "^4.9.5"
+  }
+}
