@@ -63,9 +63,14 @@ export default function () {
    * - WavStreamPlayer (speech output)
    * - RealtimeClient (API client)
    */
+  const clientRef = useRef<RealtimeClient>()
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
-  const clientRef = useRef<RealtimeClient>(new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL }))
+  useEffect(() => {
+    fetch('/api/i', { method: 'POST' }).then(res => res.json()).then(res => {
+      clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true})
+    })
+  }, [])
   /**
    * References for
    * - Rendering audio visualization (canvas)
@@ -85,7 +90,6 @@ export default function () {
   const [items, setItems] = useState<ItemType[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
-  const [canPushToTalk, setCanPushToTalk] = useState(true)
   const [messages, setMessages] = useState<ItemType[]>([])
   const [loadingMessages, setLoadingMessages] = useState<boolean>(true)
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([])
@@ -112,23 +116,25 @@ export default function () {
     startTimeRef.current = new Date().toISOString()
     setIsConnected(true)
     setRealtimeEvents([])
-    setItems(client.conversation.getItems())
+    if (client) setItems(client.conversation.getItems())
     // Connect to microphone
     await wavRecorder.begin()
     // Connect to audio output
     await wavStreamPlayer.connect()
     // Connect to realtime API
-    await client.connect()
-    if (messages.length < 1) {
-      client.sendUserMessageContent([
-        {
-          type: `input_text`,
-          text: `Hello!`,
-        },
-      ])
+    if (client) {
+      await client.connect()
+      if (messages.length < 1) {
+        client.sendUserMessageContent([
+          {
+            type: `input_text`,
+            text: `Hello!`,
+          },
+        ])
+      }
+      if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
     }
-    if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
-  }, [messages])
+  }, [messages, clientRef.current])
   /**
    * Disconnect and reset conversation state
    */
@@ -137,12 +143,12 @@ export default function () {
     // setRealtimeEvents([])
     // setItems([])
     const client = clientRef.current
-    client.disconnect()
+    if (client) client.disconnect()
     // const wavRecorder = wavRecorderRef.current
     // await wavRecorder.end()
     // const wavStreamPlayer = wavStreamPlayerRef.current
     // await wavStreamPlayer.interrupt()
-  }, [])
+  }, [clientRef.current])
   /**
    * In push-to-talk mode, start recording
    * .appendInputAudio() for each sample
@@ -155,9 +161,9 @@ export default function () {
     const trackSampleOffset = await wavStreamPlayer.interrupt()
     if (trackSampleOffset?.trackId) {
       const { trackId, offset } = trackSampleOffset
-      await client.cancelResponse(trackId, offset)
+      if (client) await client.cancelResponse(trackId, offset)
     }
-    await wavRecorder.record((data) => client.appendInputAudio(data.mono))
+    if (client) await wavRecorder.record((data) => client.appendInputAudio(data.mono))
   }
   /**
    * In push-to-talk mode, stop recording
@@ -167,18 +173,7 @@ export default function () {
     const client = clientRef.current
     const wavRecorder = wavRecorderRef.current
     await wavRecorder.pause()
-    client.createResponse()
-  }
-  /**
-   * Switch between Manual <> VAD mode for communication
-   */
-  const changeTurnEndType = async (value: string) => {
-    const client = clientRef.current
-    const wavRecorder = wavRecorderRef.current
-    if (value === 'none' && wavRecorder.getStatus() === 'recording') await wavRecorder.pause()
-    client.updateSession({ turn_detection: value === 'none' ? null : { type: 'server_vad' } })
-    if (value === 'server_vad' && client.isConnected()) await wavRecorder.record((data) => client.appendInputAudio(data.mono))
-    setCanPushToTalk(value === 'none')
+    if (client) client.createResponse()
   }
   /**
    * Auto-scroll the event logs
@@ -193,7 +188,7 @@ export default function () {
         eventsScrollHeightRef.current = scrollHeight
       }
     }
-  }, [realtimeEvents])
+  }, [realtimeEvents, clientRef.current])
   /**
    * Auto-scroll the conversation logs
    */
@@ -220,6 +215,7 @@ export default function () {
     try {
       let tmp_1: any = await syncConversationItem({ ...items[items.length - 1] })
       let tmp_2: any = await syncConversationItem({ ...items[items.length - 2] })
+      console.log(tmp_1, tmp_2)
       if (tmp_2.role !== 'user' || tmp_1.role !== 'assistant' || !tmp_1.content[0]?.transcript || !tmp_2.content[0]?.transcript) return
       await fetch('/api/c/', {
         method: 'POST',
@@ -246,7 +242,7 @@ export default function () {
       const conversationEl = el as HTMLDivElement
       conversationEl.scrollTop = conversationEl.scrollHeight
     }
-  }, [items])
+  }, [items, clientRef.current])
   /**
    * Set up render loops for the visualization canvas
    */
@@ -291,7 +287,7 @@ export default function () {
     return () => {
       isLoaded = false
     }
-  }, [])
+  }, [clientRef.current])
   /**
    * Core RealtimeClient and audio capture setup
    * Set all of our instructions, tools, events and more
@@ -301,39 +297,43 @@ export default function () {
     // Get refs
     const wavStreamPlayer = wavStreamPlayerRef.current
     const client = clientRef.current
-    // Set instructions
-    client.updateSession({ instructions: instructions })
-    // Set transcription, otherwise we don't get user transcriptions back
-    client.updateSession({ input_audio_transcription: { model: 'whisper-1' } })
-    // handle realtime events from client + server for event logging
-    client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
-      setRealtimeEvents((realtimeEvents) => {
-        const lastEvent = realtimeEvents[realtimeEvents.length - 1]
-        if (lastEvent?.event.type === realtimeEvent.event.type) {
-          // if we receive multiple events in a row, aggregate them for display purposes
-          lastEvent.count = (lastEvent.count || 0) + 1
-          return realtimeEvents.slice(0, -1).concat(lastEvent)
-        }
-        return realtimeEvents.concat(realtimeEvent)
+    if (client) {
+      // Set instructions
+      client.updateSession({ instructions: instructions })
+      // Set transcription, otherwise we don't get user transcriptions back
+      client.updateSession({ input_audio_transcription: { model: 'whisper-1' } })
+      // handle realtime events from client + server for event logging
+      client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
+        setRealtimeEvents((realtimeEvents) => {
+          const lastEvent = realtimeEvents[realtimeEvents.length - 1]
+          if (lastEvent?.event.type === realtimeEvent.event.type) {
+            // if we receive multiple events in a row, aggregate them for display purposes
+            lastEvent.count = (lastEvent.count || 0) + 1
+            return realtimeEvents.slice(0, -1).concat(lastEvent)
+          }
+          return realtimeEvents.concat(realtimeEvent)
+        })
       })
-    })
-    client.on('error', (event: any) => console.error(event))
-    client.on('conversation.interrupted', async () => {
-      const trackSampleOffset = await wavStreamPlayer.interrupt()
-      if (trackSampleOffset?.trackId) {
-        const { trackId, offset } = trackSampleOffset
-        await client.cancelResponse(trackId, offset)
-      }
-    })
-    client.on('conversation.updated', async ({ item, delta }: any) => {
-      const items = client.conversation.getItems()
-      if (delta?.audio) wavStreamPlayer.add16BitPCM(delta.audio, item.id)
-      if (item.status === 'completed' && item.formatted.audio?.length) item.formatted.file = await WavRecorder.decode(item.formatted.audio, 24000, 24000)
-      setItems(items)
-    })
-    setItems(client.conversation.getItems())
-    return () => client.reset()
-  }, [])
+      client.on('error', (event: any) => console.error(event))
+      client.on('conversation.interrupted', async () => {
+        const trackSampleOffset = await wavStreamPlayer.interrupt()
+        if (trackSampleOffset?.trackId) {
+          const { trackId, offset } = trackSampleOffset
+          await client.cancelResponse(trackId, offset)
+        }
+      })
+      client.on('conversation.updated', async ({ item, delta }: any) => {
+        const items = client.conversation.getItems()
+        if (delta?.audio) wavStreamPlayer.add16BitPCM(delta.audio, item.id)
+        if (item.status === 'completed' && item.formatted.audio?.length) item.formatted.file = await WavRecorder.decode(item.formatted.audio, 24000, 24000)
+        setItems(items)
+      })
+      setItems(client.conversation.getItems())
+    }
+    return () => {
+      if (client) client.reset()
+    }
+  }, [clientRef.current])
   useEffect(() => {
     fetch('/api/c?id=' + slug)
       .then((res) => res.json())
@@ -351,7 +351,7 @@ export default function () {
         }
       })
       .finally(() => setLoadingMessages(false))
-  }, [])
+  }, [clientRef.current])
   /**
    * Render the application
    */
@@ -359,11 +359,11 @@ export default function () {
     <NoSSR>
       <div className="flex flex-row items-center h-screen w-screen">
         <div className="flex flex-col w-1/2 p-4 items-center">
-          {isConnected && canPushToTalk && (
+          {isConnected && (
             <Button
+              disabled={!isConnected}
               onMouseUp={stopRecording}
               onMouseDown={startRecording}
-              disabled={!isConnected || !canPushToTalk}
               label={isRecording ? 'Release to send' : 'Hold to speak'}
               buttonStyle={isRecording ? 'bg-white text-black border' : 'bg-white text-black border'}
             />
