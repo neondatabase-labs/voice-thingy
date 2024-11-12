@@ -3,7 +3,7 @@ import { Client } from 'pg'
 
 export async function POST(request: Request) {
   const { id, item } = await request.json()
-  if (!id || !item) return NextResponse.json({})
+  if (!id || !item) return NextResponse.json({}, { status: 400 })
   const client = new Client({ connectionString: process.env.DATABASE_URL })
   await client.connect()
   await client.query(

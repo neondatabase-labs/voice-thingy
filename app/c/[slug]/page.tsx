@@ -13,7 +13,7 @@
 const LOCAL_RELAY_SERVER_URL = process.env.NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL as string
 
 import Button from '@/components/Button'
-import Toggle from '@/components/Toggle'
+import Message from '@/components/Message'
 import instructions from '@/lib/instructions'
 import { RealtimeEvent } from '@/lib/types'
 import { normalizeArray } from '@/lib/utils'
@@ -22,7 +22,7 @@ import { RealtimeClient } from '@openai/realtime-api-beta'
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { X, Zap } from 'react-feather'
+import { Mic, X } from 'react-feather'
 import NoSSR from 'react-no-ssr'
 
 function drawBars(
@@ -83,10 +83,11 @@ export default function () {
    * - realtimeEvents are event logs, which can be expanded
    */
   const [items, setItems] = useState<ItemType[]>([])
-  const [messages, setMessages] = useState<ItemType[]>([])
-  const [isRecording, setIsRecording] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
   const [canPushToTalk, setCanPushToTalk] = useState(true)
+  const [messages, setMessages] = useState<ItemType[]>([])
+  const [loadingMessages, setLoadingMessages] = useState<boolean>(true)
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([])
   /**
    * When you click the API key
@@ -118,14 +119,16 @@ export default function () {
     await wavStreamPlayer.connect()
     // Connect to realtime API
     await client.connect()
-    client.sendUserMessageContent([
-      {
-        type: `input_text`,
-        text: `Hello!`,
-      },
-    ])
+    if (messages.length < 1) {
+      client.sendUserMessageContent([
+        {
+          type: `input_text`,
+          text: `Hello!`,
+        },
+      ])
+    }
     if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
-  }, [])
+  }, [messages])
   /**
    * Disconnect and reset conversation state
    */
@@ -335,83 +338,48 @@ export default function () {
     fetch('/api/c?id=' + slug)
       .then((res) => res.json())
       .then((res) => {
-        setMessages(
-          res.map((i: any) => ({
-            ...i,
-            formatted: {
-              text: i.content_transcript,
-              transcript: i.content_transcript,
-            },
-          })),
-        )
+        if (res.length > 0) {
+          setMessages(
+            res.map((i: any) => ({
+              ...i,
+              formatted: {
+                text: i.content_transcript,
+                transcript: i.content_transcript,
+              },
+            })),
+          )
+        }
       })
+      .finally(() => setLoadingMessages(false))
   }, [])
   /**
    * Render the application
    */
   return (
     <NoSSR>
-      <div>
-        <Toggle defaultValue={false} labels={['manual', 'vad']} values={['none', 'server_vad']} onChange={(_, value) => changeTurnEndType(value)} />
-        {isConnected && canPushToTalk && (
+      <div className="flex flex-row">
+        <div className="flex flex-col w-1/2 p-4">
+          {isConnected && canPushToTalk && (
+            <Button
+              onMouseUp={stopRecording}
+              onMouseDown={startRecording}
+              disabled={!isConnected || !canPushToTalk}
+              label={isRecording ? 'Release to send' : 'Hold to speak'}
+              buttonStyle={isRecording ? 'bg-white text-black border' : 'bg-white text-black border'}
+            />
+          )}
           <Button
-            onMouseUp={stopRecording}
-            onMouseDown={startRecording}
-            disabled={!isConnected || !canPushToTalk}
-            buttonStyle={isRecording ? 'alert' : 'regular'}
-            label={isRecording ? 'release to send' : 'push to talk'}
+            disabled={loadingMessages}
+            icon={isConnected ? X : Mic}
+            iconPosition={isConnected ? 'end' : 'start'}
+            label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
+            onClick={isConnected ? disconnectConversation : connectConversation}
           />
-        )}
-        <Button
-          icon={isConnected ? X : Zap}
-          iconPosition={isConnected ? 'end' : 'start'}
-          label={isConnected ? 'disconnect' : 'connect'}
-          buttonStyle={isConnected ? 'regular' : 'action'}
-          onClick={isConnected ? disconnectConversation : connectConversation}
-        />
-      </div>
-      <div>
-        <div>conversation</div>
-        <div data-conversation-content>
-          {!items.length && <span>awaiting connection...</span>}
-          {messages.map((conversationItem, i) => {
-            return (
-              <div key={conversationItem.id}>
-                <div className={`${conversationItem.role || ''}`}>
-                  <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
-                </div>
-                <div>
-                  {conversationItem.role === 'user' && (
-                    <div>
-                      {conversationItem.formatted.transcript ||
-                        (conversationItem.formatted.audio?.length ? '(awaiting transcript)' : conversationItem.formatted.text || '(item sent)')}
-                    </div>
-                  )}
-                  {conversationItem.role === 'assistant' && <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>}
-                  {conversationItem.formatted?.file && <audio src={conversationItem.formatted.file.url} controls />}
-                </div>
-              </div>
-            )
-          })}
-          {items.map((conversationItem, i) => {
-            return (
-              <div key={conversationItem.id}>
-                <div className={`${conversationItem.role || ''}`}>
-                  <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
-                </div>
-                <div>
-                  {conversationItem.role === 'user' && (
-                    <div>
-                      {conversationItem.formatted.transcript ||
-                        (conversationItem.formatted.audio?.length ? '(awaiting transcript)' : conversationItem.formatted.text || '(item sent)')}
-                    </div>
-                  )}
-                  {conversationItem.role === 'assistant' && <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>}
-                  {conversationItem.formatted?.file && <audio src={conversationItem.formatted.file.url} controls />}
-                </div>
-              </div>
-            )
-          })}
+        </div>
+        <div data-conversation-content className="flex flex-col w-1/2 p-4 gap-y-4">
+          {[...messages, ...items].map((conversationItem) => (
+            <Message key={conversationItem.id} conversationItem={conversationItem} />
+          ))}
         </div>
       </div>
     </NoSSR>
