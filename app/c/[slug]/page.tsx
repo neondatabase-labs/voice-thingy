@@ -349,7 +349,6 @@ export default function () {
    */
   return (
     <NoSSR>
-      {/* <div>{!NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL && <Button icon={Edit} label={`api key: ${apiKey.slice(0, 3)}...`} onClick={() => resetAPIKey()} />}</div> */}
       <div>
         <Toggle defaultValue={false} labels={['manual', 'vad']} values={['none', 'server_vad']} onChange={(_, value) => changeTurnEndType(value)} />
         {isConnected && canPushToTalk && (
@@ -401,16 +400,16 @@ export default function () {
                   <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
                 </div>
                 <div>
-                  {!conversationItem.formatted.tool && conversationItem.role === 'user' && (
+                {conversationItem.role === 'user' && (
                     <div>
                       {conversationItem.formatted.transcript ||
                         (conversationItem.formatted.audio?.length ? '(awaiting transcript)' : conversationItem.formatted.text || '(item sent)')}
                     </div>
                   )}
-                  {!conversationItem.formatted.tool && conversationItem.role === 'assistant' && (
+                  {conversationItem.role === 'assistant' && (
                     <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>
                   )}
-                  {conversationItem.formatted.file && <audio src={conversationItem.formatted.file.url} controls />}
+                  {conversationItem.formatted?.file && <audio src={conversationItem.formatted.file.url} controls />}
                 </div>
               </div>
             )
