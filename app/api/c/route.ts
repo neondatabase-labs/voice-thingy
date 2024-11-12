@@ -1,5 +1,7 @@
+import { Client, neonConfig } from '@neondatabase/serverless'
 import { NextResponse } from 'next/server'
-import { Client } from 'pg'
+
+neonConfig.poolQueryViaFetch = true
 
 export async function POST(request: Request) {
   const { id, item } = await request.json()
@@ -10,7 +12,6 @@ export async function POST(request: Request) {
     `INSERT INTO messages (id, session_id, content_type, content_transcript, object, role, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT DO NOTHING`,
     [item.id, id, item.content[0].type, item.content[0].transcript, item.object, item.role, item.status, item.type],
   )
-  await client.end()
   return NextResponse.json({})
 }
 
