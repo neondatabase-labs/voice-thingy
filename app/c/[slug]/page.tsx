@@ -134,14 +134,14 @@ export default function () {
    */
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false)
-    setRealtimeEvents([])
-    setItems([])
+    // setRealtimeEvents([])
+    // setItems([])
     const client = clientRef.current
     client.disconnect()
-    const wavRecorder = wavRecorderRef.current
-    await wavRecorder.end()
-    const wavStreamPlayer = wavStreamPlayerRef.current
-    await wavStreamPlayer.interrupt()
+    // const wavRecorder = wavRecorderRef.current
+    // await wavRecorder.end()
+    // const wavStreamPlayer = wavStreamPlayerRef.current
+    // await wavStreamPlayer.interrupt()
   }, [])
   /**
    * In push-to-talk mode, start recording
