@@ -16,5 +16,5 @@ export async function POST() {
     }),
   })
   const { key: apiKey } = await response.json()
-  return NextResponse.json({apiKey})
+  return NextResponse.json({ apiKey })
 }

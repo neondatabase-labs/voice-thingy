@@ -67,9 +67,11 @@ export default function () {
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
   useEffect(() => {
-    fetch('/api/i', { method: 'POST' }).then(res => res.json()).then(res => {
-      clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true})
-    })
+    fetch('/api/i', { method: 'POST' })
+      .then((res) => res.json())
+      .then((res) => {
+        clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true })
+      })
   }, [])
   /**
    * References for
