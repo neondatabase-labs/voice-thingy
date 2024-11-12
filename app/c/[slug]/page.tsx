@@ -83,6 +83,7 @@ export default function () {
    * - realtimeEvents are event logs, which can be expanded
    */
   const [items, setItems] = useState<ItemType[]>([])
+  const [messages, setMessages] = useState<ItemType[]>([])
   const [isRecording, setIsRecording] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
   const [canPushToTalk, setCanPushToTalk] = useState(true)
@@ -139,10 +140,6 @@ export default function () {
     const wavStreamPlayer = wavStreamPlayerRef.current
     await wavStreamPlayer.interrupt()
   }, [])
-  const deleteConversationItem = useCallback(async (id: string) => {
-    const client = clientRef.current
-    client.deleteItem(id)
-  }, [])
   /**
    * In push-to-talk mode, start recording
    * .appendInputAudio() for each sample
@@ -176,9 +173,7 @@ export default function () {
     const client = clientRef.current
     const wavRecorder = wavRecorderRef.current
     if (value === 'none' && wavRecorder.getStatus() === 'recording') await wavRecorder.pause()
-    client.updateSession({
-      turn_detection: value === 'none' ? null : { type: 'server_vad' },
-    })
+    client.updateSession({ turn_detection: value === 'none' ? null : { type: 'server_vad' } })
     if (value === 'server_vad' && client.isConnected()) await wavRecorder.record((data) => client.appendInputAudio(data.mono))
     setCanPushToTalk(value === 'none')
   }
@@ -199,7 +194,50 @@ export default function () {
   /**
    * Auto-scroll the conversation logs
    */
+  const syncConversationItem = async (tmp: any) => {
+    let tmpText
+    if (tmp.status === 'completed') {
+      tmpText = tmp.content[0].transcript || tmp.content[0].text
+      if (!tmpText) {
+        tmpText = await new Promise((resolve) => {
+          const checkText = () => {
+            let tmpText = tmp.formatted.transcript || (tmp.formatted.audio?.length ? null : tmp.formatted.text || null)
+            if (tmpText) resolve(tmpText)
+            else requestAnimationFrame(checkText)
+          }
+          checkText()
+        })
+      }
+      tmp['content'] = [{ ...tmp['content'][0], transcript: tmpText }]
+      delete tmp['formatted']
+      return tmp
+    }
+  }
+  const syncConversation = async (items: ItemType[]) => {
+    try {
+      let tmp_1: any = await syncConversationItem({ ...items[items.length - 1] })
+      let tmp_2: any = await syncConversationItem({ ...items[items.length - 2] })
+      if (tmp_2.role !== 'user' || tmp_1.role !== 'assistant' || !tmp_1.content[0]?.transcript || !tmp_2.content[0]?.transcript) return
+      await fetch('/api/c/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: slug, item: tmp_2 }),
+      })
+      await fetch('/api/c/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: slug, item: tmp_1 }),
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
   useEffect(() => {
+    syncConversation(items)
     const conversationEls = [].slice.call(document.body.querySelectorAll('[data-conversation-content]'))
     for (const el of conversationEls) {
       const conversationEl = el as HTMLDivElement
@@ -286,17 +324,25 @@ export default function () {
     })
     client.on('conversation.updated', async ({ item, delta }: any) => {
       const items = client.conversation.getItems()
-      if (delta?.audio) {
-        wavStreamPlayer.add16BitPCM(delta.audio, item.id)
-      }
-      if (item.status === 'completed' && item.formatted.audio?.length) {
-        const wavFile = await WavRecorder.decode(item.formatted.audio, 24000, 24000)
-        item.formatted.file = wavFile
-      }
+      if (delta?.audio) wavStreamPlayer.add16BitPCM(delta.audio, item.id)
+      if (item.status === 'completed' && item.formatted.audio?.length) item.formatted.file = await WavRecorder.decode(item.formatted.audio, 24000, 24000)
       setItems(items)
     })
     setItems(client.conversation.getItems())
     return () => client.reset()
+  }, [])
+  useEffect(() => {
+    fetch('/api/c?id='+slug)
+    .then((res) => res.json())
+    .then((res) => {
+      setMessages(res.map((i: any) => ({
+       ...i,
+       formatted: {
+        text: i.content_transcript,
+        transcript: i.content_transcript,
+       } 
+      })))
+    })
   }, [])
   /**
    * Render the application
@@ -327,24 +373,34 @@ export default function () {
         <div>conversation</div>
         <div data-conversation-content>
           {!items.length && <span>awaiting connection...</span>}
+          {messages.map((conversationItem, i) => {
+            return (
+              <div key={conversationItem.id}>
+                <div className={`${conversationItem.role || ''}`}>
+                  <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
+                </div>
+                <div>
+                  {conversationItem.role === 'user' && (
+                    <div>
+                      {conversationItem.formatted.transcript ||
+                        (conversationItem.formatted.audio?.length ? '(awaiting transcript)' : conversationItem.formatted.text || '(item sent)')}
+                    </div>
+                  )}
+                  {conversationItem.role === 'assistant' && (
+                    <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>
+                  )}
+                  {conversationItem.formatted?.file && <audio src={conversationItem.formatted.file.url} controls />}
+                </div>
+              </div>
+            )
+          })}
           {items.map((conversationItem, i) => {
             return (
               <div key={conversationItem.id}>
                 <div className={`${conversationItem.role || ''}`}>
                   <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
-                  <div onClick={() => deleteConversationItem(conversationItem.id)}>
-                    <X />
-                  </div>
                 </div>
                 <div>
-                  {/* tool response */}
-                  {conversationItem.type === 'function_call_output' && <div>{conversationItem.formatted.output}</div>}
-                  {/* tool call */}
-                  {!!conversationItem.formatted.tool && (
-                    <div>
-                      {conversationItem.formatted.tool.name}({conversationItem.formatted.tool.arguments})
-                    </div>
-                  )}
                   {!conversationItem.formatted.tool && conversationItem.role === 'user' && (
                     <div>
                       {conversationItem.formatted.transcript ||

@@ -2,16 +2,27 @@ import { NextResponse } from 'next/server'
 import { Client } from 'pg'
 
 export async function POST(request: Request) {
-  const { id, username, message_text } = await request.json()
+  const { id, item } = await request.json()
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
   })
   await client.connect()
-  const result = await client.query(`INSERT INTO messages (session_id, sender, message_text) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING message_id, created_at`, [
-    id,
-    username,
-    message_text,
-  ])
+  await client.query(
+    `INSERT INTO messages (id, session_id, content_type, content_transcript, object, role, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT DO NOTHING`,
+    [item.id, id, item.content[0].type, item.content[0].transcript, item.object, item.role, item.status, item.type],
+  )
   await client.end()
-  return NextResponse.json(result.rows[0])
+  return NextResponse.json({})
+}
+
+export async function GET(request: Request) {
+  const id = new URL(request.url).searchParams.get('id')
+  if (!id) return NextResponse.json([])
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  })
+  await client.connect()
+  const { rows } = await client.query(`SELECT * from messages WHERE session_id = $1`, [id])
+  await client.end()
+  return NextResponse.json(rows)
 }
