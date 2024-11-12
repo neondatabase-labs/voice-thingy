@@ -217,7 +217,6 @@ export default function () {
     try {
       let tmp_1: any = await syncConversationItem({ ...items[items.length - 1] })
       let tmp_2: any = await syncConversationItem({ ...items[items.length - 2] })
-      console.log(tmp_1, tmp_2)
       if (tmp_2.role !== 'user' || tmp_1.role !== 'assistant' || !tmp_1.content[0]?.transcript || !tmp_2.content[0]?.transcript) return
       await fetch('/api/c/', {
         method: 'POST',
@@ -234,7 +233,7 @@ export default function () {
         body: JSON.stringify({ id: slug, item: tmp_1 }),
       })
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
   useEffect(() => {
