@@ -357,8 +357,8 @@ export default function () {
    */
   return (
     <NoSSR>
-      <div className="flex flex-row">
-        <div className="flex flex-col w-1/2 p-4">
+      <div className="flex flex-row items-center h-screen w-screen">
+        <div className="flex flex-col w-1/2 p-4 items-center">
           {isConnected && canPushToTalk && (
             <Button
               onMouseUp={stopRecording}
@@ -374,9 +374,10 @@ export default function () {
             iconPosition={isConnected ? 'end' : 'start'}
             label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
             onClick={isConnected ? disconnectConversation : connectConversation}
+            buttonStyle={isConnected ? 'bg-red-600 text-white' : 'bg-green-800 text-white'}
           />
         </div>
-        <div data-conversation-content className="flex flex-col w-1/2 p-4 gap-y-4">
+        <div data-conversation-content className="flex flex-col w-1/2 p-4 gap-y-4 overflow-y-scroll max-h-[600px]">
           {[...messages, ...items].map((conversationItem) => (
             <Message key={conversationItem.id} conversationItem={conversationItem} />
           ))}
