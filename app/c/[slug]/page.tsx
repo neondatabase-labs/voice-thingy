@@ -332,17 +332,19 @@ export default function () {
     return () => client.reset()
   }, [])
   useEffect(() => {
-    fetch('/api/c?id='+slug)
-    .then((res) => res.json())
-    .then((res) => {
-      setMessages(res.map((i: any) => ({
-       ...i,
-       formatted: {
-        text: i.content_transcript,
-        transcript: i.content_transcript,
-       } 
-      })))
-    })
+    fetch('/api/c?id=' + slug)
+      .then((res) => res.json())
+      .then((res) => {
+        setMessages(
+          res.map((i: any) => ({
+            ...i,
+            formatted: {
+              text: i.content_transcript,
+              transcript: i.content_transcript,
+            },
+          })),
+        )
+      })
   }, [])
   /**
    * Render the application
@@ -385,9 +387,7 @@ export default function () {
                         (conversationItem.formatted.audio?.length ? '(awaiting transcript)' : conversationItem.formatted.text || '(item sent)')}
                     </div>
                   )}
-                  {conversationItem.role === 'assistant' && (
-                    <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>
-                  )}
+                  {conversationItem.role === 'assistant' && <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>}
                   {conversationItem.formatted?.file && <audio src={conversationItem.formatted.file.url} controls />}
                 </div>
               </div>
@@ -400,15 +400,13 @@ export default function () {
                   <div>{(conversationItem.role || conversationItem.type).replaceAll('_', ' ')}</div>
                 </div>
                 <div>
-                {conversationItem.role === 'user' && (
+                  {conversationItem.role === 'user' && (
                     <div>
                       {conversationItem.formatted.transcript ||
                         (conversationItem.formatted.audio?.length ? '(awaiting transcript)' : conversationItem.formatted.text || '(item sent)')}
                     </div>
                   )}
-                  {conversationItem.role === 'assistant' && (
-                    <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>
-                  )}
+                  {conversationItem.role === 'assistant' && <div>{conversationItem.formatted.transcript || conversationItem.formatted.text || '(truncated)'}</div>}
                   {conversationItem.formatted?.file && <audio src={conversationItem.formatted.file.url} controls />}
                 </div>
               </div>

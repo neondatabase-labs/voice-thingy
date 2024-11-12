@@ -4,6 +4,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "schema": "tsx ./schema.tsx",
     "relay": "tsx ./relay-server/index.js",
     "fmt": "prettier --write '**/*' --ignore-unknown"
   },

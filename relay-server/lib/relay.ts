@@ -54,11 +54,8 @@ export default class RealtimeRelay {
     }
     // @ts-ignore
     ws.on('message', (data) => {
-      if (!client.isConnected()) {
-        messageQueue.push(data)
-      } else {
-        messageHandler(data)
-      }
+      if (!client.isConnected()) messageQueue.push(data)
+      else messageHandler(data)
     })
     ws.on('close', () => client.disconnect())
     try {

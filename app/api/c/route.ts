@@ -3,9 +3,8 @@ import { Client } from 'pg'
 
 export async function POST(request: Request) {
   const { id, item } = await request.json()
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-  })
+  if (!id || !item) return NextResponse.json({})
+  const client = new Client({ connectionString: process.env.DATABASE_URL })
   await client.connect()
   await client.query(
     `INSERT INTO messages (id, session_id, content_type, content_transcript, object, role, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT DO NOTHING`,
@@ -18,9 +17,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get('id')
   if (!id) return NextResponse.json([])
-  const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-  })
+  const client = new Client({ connectionString: process.env.DATABASE_URL })
   await client.connect()
   const { rows } = await client.query(`SELECT * from messages WHERE session_id = $1`, [id])
   await client.end()
