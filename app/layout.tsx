@@ -1,6 +1,8 @@
 import '@/globals.css'
 import config from '@/lib/config'
 import { Metadata } from 'next'
+import Footer from './components/Footer'
+import Header from './components/Header'
 
 export const metadata: Metadata = {
   title: config.title,
@@ -26,7 +28,11 @@ export default function ({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Header />
+        {children}
+        <Footer />
+      </body>
     </html>
   )
 }

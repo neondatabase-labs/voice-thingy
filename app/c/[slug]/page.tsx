@@ -352,7 +352,7 @@ export default function () {
    */
   return (
     <NoSSR>
-      <div className="py-24 flex flex-col items-center h-screen w-screen">
+      <div className="flex flex-col items-center justify-center w-screen min-h-[calc(100vh-90px)]">
         {isConnected && (
           <Button
             iconPosition={'start'}
