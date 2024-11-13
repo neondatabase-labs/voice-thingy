@@ -1,6 +1,7 @@
 import '@/globals.css'
 import config from '@/lib/config'
 import { Metadata } from 'next'
+import { Toaster } from 'sonner'
 import Footer from './components/Footer'
 import Header from './components/Header'
 
@@ -29,6 +30,7 @@ export default function ({
   return (
     <html lang="en">
       <body>
+        <Toaster />
         <Header />
         {children}
         <Footer />

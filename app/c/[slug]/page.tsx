@@ -25,6 +25,7 @@ import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Mic, PlayCircle, StopCircle, X } from 'react-feather'
 import NoSSR from 'react-no-ssr'
+import { toast } from 'sonner'
 
 function drawBars(
   canvas: HTMLCanvasElement,
@@ -62,10 +63,15 @@ export default function () {
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
   useEffect(() => {
+    toast('Setting up OpenAI Realtime client...')
     fetch('/api/i', { method: 'POST' })
       .then((res) => res.json())
       .then((res) => {
+        toast('Succesfully set up OpenAI Realtime client.')
         clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true })
+      })
+      .catch(() => {
+        toast('Failed to set up OpenAI Realtime client :/')
       })
   }, [])
   /**
@@ -330,9 +336,11 @@ export default function () {
     }
   }, [clientRef.current])
   useEffect(() => {
+    toast('Fetching conversation history from Neon...')
     fetch('/api/c?id=' + slug)
       .then((res) => res.json())
       .then((res) => {
+        toast('Loaded conversation history from Neon succesfully.')
         if (res.length > 0) {
           setMessages(
             res.map((i: any) => ({
@@ -345,6 +353,7 @@ export default function () {
           )
         }
       })
+      .catch(() => toast('Failed to load conversation history :/'))
       .finally(() => setLoadingMessages(false))
   }, [clientRef.current])
   /**

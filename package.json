@@ -1,5 +1,5 @@
 {
-  "name": "audio-gpt",
+  "name": "voice-thingy",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,6 +19,7 @@
     "react-feather": "^2.0.10",
     "react-no-ssr": "^1.1.0",
     "save": "^2.9.0",
+    "sonner": "^1.7.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
