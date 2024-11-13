@@ -2,7 +2,6 @@ export default {
   name: 'Neon',
   url: 'https://voice-thingy.vercel.app',
   logo: 'https://neon.tech/brand/neon-logo-dark-color.svg',
-  ogImage: 'https://neon.tech/images/social-previews/index.jpg',
   title: 'Voice Thingy',
   description: 'Voice led interactions with AI.',
   lnkd: 'https://www.linkedin.com/company/neon-inc/',
