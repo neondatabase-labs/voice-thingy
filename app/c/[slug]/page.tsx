@@ -20,9 +20,10 @@ import { normalizeArray } from '@/lib/utils'
 import { WavRecorder, WavStreamPlayer } from '@/lib/wavtools/index.js'
 import { RealtimeClient } from '@openai/realtime-api-beta'
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
+import clsx from 'clsx'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Mic, X } from 'react-feather'
+import { Mic, PlayCircle, StopCircle, X } from 'react-feather'
 import NoSSR from 'react-no-ssr'
 
 function drawBars(
@@ -51,12 +52,6 @@ function drawBars(
 
 export default function () {
   const { slug } = useParams<{ slug: string }>()
-  /**
-   * Ask user for API Key
-   * If we're using the local relay server, we don't need this
-   */
-  // const apiKey = LOCAL_RELAY_SERVER_URL ? '' : localStorage.getItem('tmp::voice_api_key') || prompt('OpenAI API Key') || ''
-  // if (apiKey !== '') localStorage.setItem('tmp::voice_api_key', apiKey)
   /**
    * Instantiate:
    * - WavRecorder (speech input)
@@ -215,17 +210,16 @@ export default function () {
   }
   const syncConversation = async (items: ItemType[]) => {
     try {
-      let tmp_1: any = await syncConversationItem({ ...items[items.length - 1] })
-      let tmp_2: any = await syncConversationItem({ ...items[items.length - 2] })
-      if (tmp_2.role !== 'user' || tmp_1.role !== 'assistant' || !tmp_1.content[0]?.transcript || !tmp_2.content[0]?.transcript) return
-      await fetch('/api/c/', {
+      const [tmp_1, tmp_2] = await Promise.all([syncConversationItem({ ...items[items.length - 1] }), syncConversationItem({ ...items[items.length - 2] })])
+      if (tmp_2?.role !== 'user' || tmp_1?.role !== 'assistant' || !tmp_1?.content[0]?.transcript || !tmp_2?.content[0]?.transcript) return
+      await fetch('/api/c', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ id: slug, item: tmp_2 }),
       })
-      await fetch('/api/c/', {
+      await fetch('/api/c', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -266,7 +260,7 @@ export default function () {
           if (clientCtx) {
             clientCtx.clearRect(0, 0, clientCanvas.width, clientCanvas.height)
             const result = wavRecorder.recording ? wavRecorder.getFrequencies('voice') : { values: new Float32Array([0]) }
-            drawBars(clientCanvas, clientCtx, result.values, '#0099ff', 10, 0, 8)
+            drawBars(clientCanvas, clientCtx, result.values, '#00e599', 10, 0, 8)
           }
         }
         if (serverCanvas) {
@@ -358,31 +352,42 @@ export default function () {
    */
   return (
     <NoSSR>
-      <div className="flex flex-row items-center h-screen w-screen">
-        <div className="flex flex-col w-1/2 p-4 items-center">
-          {isConnected && (
-            <Button
-              disabled={!isConnected}
-              onMouseUp={stopRecording}
-              onMouseDown={startRecording}
-              label={isRecording ? 'Release to send' : 'Hold to speak'}
-              buttonStyle={isRecording ? 'bg-white text-black border' : 'bg-white text-black border'}
-            />
-          )}
+      <div className="py-24 flex flex-col items-center h-screen w-screen">
+        {isConnected && (
           <Button
-            disabled={loadingMessages}
-            icon={isConnected ? X : Mic}
-            iconPosition={isConnected ? 'end' : 'start'}
-            label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
-            onClick={isConnected ? disconnectConversation : connectConversation}
-            buttonStyle={isConnected ? 'bg-red-600 text-white' : 'bg-green-800 text-white'}
+            iconPosition={'start'}
+            disabled={!isConnected}
+            onMouseUp={stopRecording}
+            onMouseDown={startRecording}
+            icon={isRecording ? StopCircle : PlayCircle}
+            label={isRecording ? 'Release to send' : 'Hold to speak'}
+            buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
           />
+        )}
+        <Button
+          disabled={loadingMessages}
+          icon={isConnected ? X : Mic}
+          iconPosition={isConnected ? 'end' : 'start'}
+          label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
+          onClick={isConnected ? disconnectConversation : connectConversation}
+          buttonStyle={isConnected ? 'mt-4 bg-red-600 text-white' : 'mt-4 bg-[#00e599] text-black'}
+        />
+        <div className={clsx(!isRecording && 'hidden', 'contents')}>
+          <canvas ref={clientCanvasRef} />
         </div>
-        <div data-conversation-content className="flex flex-col w-1/2 p-4 gap-y-4 overflow-y-scroll max-h-[600px]">
-          {[...messages, ...items].map((conversationItem) => (
-            <Message key={conversationItem.id} conversationItem={conversationItem} />
-          ))}
+        <div className={clsx(isRecording && 'hidden', 'contents')}>
+          <canvas ref={serverCanvasRef} />
         </div>
+        {[...messages, ...items].length > 0 && (
+          <div className="mt-24 flex flex-col border-b">
+            <span className="border-b text-sm">Transcript</span>
+            <div data-conversation-content className="mt-2 flex flex-col p-4 gap-y-4 overflow-y-scroll max-h-[300px]">
+              {[...messages, ...items].map((conversationItem) => (
+                <Message key={conversationItem.id} conversationItem={conversationItem} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </NoSSR>
   )
