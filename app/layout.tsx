@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     title: config.title,
     description: config.description,
     url: config.url,
-    images: `https://neon.tech/docs/og?title=${btoa(config.title)}&category=${btoa('AI')}`,
+    images: `https://neon.tech/docs/og?title=${btoa(config.title)}&breadcrumb=${btoa('AI')}`,
   },
   twitter: {
     card: 'summary_large_image',
     title: config.title,
     description: config.description,
-    images: `https://neon.tech/docs/og?title=${btoa(config.title)}&category=${btoa('AI')}`,
+    images: `https://neon.tech/docs/og?title=${btoa(config.title)}&breadcrumb=${btoa('AI')}`,
   },
 }
 
