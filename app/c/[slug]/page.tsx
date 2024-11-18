@@ -380,8 +380,8 @@ export default function () {
             iconPosition="start"
             onClick={isRecording ? stopRecording : startRecording}
             disabled={allowTheButton || !isConnected || isAudioPlaying}
-            buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
             icon={allowTheButton ? null : isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
+            buttonStyle={isRecording ? 'bg-red-800 px-8 py-3 text-white' : 'bg-blue-800 px-8 py-3 text-white'}
             label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Stop recording audio' : 'Click to speak'}
           />
         )}
@@ -391,9 +391,9 @@ export default function () {
           iconPosition={isConnected ? 'end' : 'start'}
           label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
           onClick={isConnected ? disconnectConversation : connectConversation}
-          buttonStyle={isConnected ? 'bg-red-600 text-white' : 'bg-[#00e599] text-black'}
+          buttonStyle={isConnected ? 'border border-red-500 text-xs text-red-500' : 'bg-[#00e599] text-black'}
         />
-        <div className="flex flex-col items-center gap-y-2">
+        <div className="flex flex-col items-center gap-y-2 min-w-[150px] min-h-[300px]">
           <canvas className={clsx('flex flex-col', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
           <span className={clsx('flex flex-col', (!isConnected || !isRecording) && 'hidden')}>You</span>
           <canvas className={clsx('flex flex-col', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
