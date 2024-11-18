@@ -324,7 +324,7 @@ export default function () {
     let mountAudioInterval = setInterval(() => {
       // @ts-ignore
       wavStreamPlayerRef.current.getTrackSampleOffset().then((res) => setIsAudioPlaying(Boolean(res)))
-    }, 300)
+    }, 10)
     return () => {
       clearInterval(mountAudioInterval)
     }
