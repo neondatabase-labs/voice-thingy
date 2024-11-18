@@ -1,5 +1,8 @@
 <a href="https://voice-thingy.vercel.app">
-  <img alt="Voice Thingy" src="https://neon.tech/docs/og?title=Vm9pY2UgVGhpbmd5&amp;breadcrumb=QUk=">
+  <img alt="Voice Thingy" src="https://neon.tech/docs/og?title=Vm9pY2UgVGhpbmd5&amp;breadcrumb=QUk=">  
+</a>
+
+<a href="https://voice-thingy.vercel.app">
   <h1 align="center">Voice Thingy</h1>
 </a>
 
