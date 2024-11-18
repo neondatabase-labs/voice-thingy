@@ -368,7 +368,9 @@ export default function () {
           <Button
             iconPosition={'start'}
             onMouseUp={stopRecording}
+            onTouchEnd={stopRecording}
             onMouseDown={startRecording}
+            onTouchStart={startRecording}
             disabled={!isConnected || isAudioPlaying}
             icon={isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
             buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
