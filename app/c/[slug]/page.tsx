@@ -28,16 +28,7 @@ import { Mic, PlayCircle, Radio, StopCircle, X } from 'react-feather'
 import NoSSR from 'react-no-ssr'
 import { toast } from 'sonner'
 
-function drawBars(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
-  data: Float32Array,
-  color: string,
-  pointCount: number = 0,
-  barWidth: number = 0,
-  barSpacing: number = 0,
-  center: boolean = false,
-) {
+function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data: Float32Array, color: string, pointCount: number = 0, barWidth: number = 0, barSpacing: number = 0, center: boolean = false) {
   pointCount = Math.floor(Math.min(pointCount, (canvas.width - barSpacing) / (Math.max(barWidth, 1) + barSpacing)))
   if (!pointCount) pointCount = Math.floor((canvas.width - barSpacing) / (Math.max(barWidth, 1) + barSpacing))
   if (!barWidth) barWidth = (canvas.width - barSpacing) / pointCount - barSpacing

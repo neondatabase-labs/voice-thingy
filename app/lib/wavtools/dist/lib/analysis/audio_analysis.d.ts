@@ -21,14 +21,7 @@ export class AudioAnalysis {
    * @param {number} [maxDecibels] default -30
    * @returns {AudioAnalysisOutputType}
    */
-  static getFrequencies(
-    analyser: AnalyserNode,
-    sampleRate: number,
-    fftResult?: Float32Array,
-    analysisType?: 'frequency' | 'music' | 'voice',
-    minDecibels?: number,
-    maxDecibels?: number,
-  ): AudioAnalysisOutputType
+  static getFrequencies(analyser: AnalyserNode, sampleRate: number, fftResult?: Float32Array, analysisType?: 'frequency' | 'music' | 'voice', minDecibels?: number, maxDecibels?: number): AudioAnalysisOutputType
   /**
    * Creates a new AudioAnalysis instance for an HTMLAudioElement
    * @param {HTMLAudioElement} audioElement
