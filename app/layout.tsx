@@ -1,9 +1,15 @@
 import '@/globals.css'
 import config from '@/lib/config'
 import { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
 import Footer from './components/Footer'
 import Header from './components/Header'
+
+const interFont = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: config.title,
@@ -29,7 +35,7 @@ export default function ({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={interFont.className}>
         <Toaster />
         <Header />
         {children}
