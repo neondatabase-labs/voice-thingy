@@ -365,9 +365,13 @@ export default function () {
           <Link href="/">
             <span className="text-purple-600">Voice</span>Thingy
           </Link>
-          <button className="text-sm" onClick={() => setIsTranscriptOpen(!isTranscriptOpen)}>
-            Show Transcript
-          </button>
+          {[...messages, ...items].filter(Boolean).length > 0 ? (
+            <button className="text-sm" onClick={() => setIsTranscriptOpen(!isTranscriptOpen)}>
+              Show Transcript
+            </button>
+          ) : (
+            <span></span>
+          )}
         </div>
       </header>
       <div className="mt-8 flex flex-col w-screen items-center justify-center gap-4 min-h-[calc(100vh-120px)] max-w-7xl">
