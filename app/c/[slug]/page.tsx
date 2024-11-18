@@ -10,6 +10,7 @@
  * This will also require you to set OPENAI_API_KEY= in a `.env` file
  * You can run it with `pnpm relay`, in parallel with `pnpm start`
  */
+
 const LOCAL_RELAY_SERVER_URL = process.env.NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL as string
 
 import Button from '@/components/Button'
@@ -23,7 +24,7 @@ import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
 import clsx from 'clsx'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Mic, PlayCircle, StopCircle, X } from 'react-feather'
+import { Mic, PlayCircle, Radio, StopCircle, X } from 'react-feather'
 import NoSSR from 'react-no-ssr'
 import { toast } from 'sonner'
 
@@ -60,10 +61,11 @@ export default function () {
    * - RealtimeClient (API client)
    */
   const clientRef = useRef<RealtimeClient>()
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
   useEffect(() => {
-    toast('Setting up OpenAI Realtime client...')
+    toast('Setting up OpenAI Realtime (with Braintrust)...')
     fetch('/api/i', { method: 'POST' })
       .then((res) => res.json())
       .then((res) => {
@@ -147,8 +149,8 @@ export default function () {
     // setItems([])
     const client = clientRef.current
     if (client) client.disconnect()
-    // const wavRecorder = wavRecorderRef.current
-    // await wavRecorder.end()
+    const wavRecorder = wavRecorderRef.current
+    await wavRecorder.end()
     // const wavStreamPlayer = wavStreamPlayerRef.current
     // await wavStreamPlayer.interrupt()
   }, [clientRef.current])
@@ -336,6 +338,15 @@ export default function () {
     }
   }, [clientRef.current])
   useEffect(() => {
+    let mountAudioInterval = setInterval(() => {
+      // @ts-ignore
+      wavStreamPlayerRef.current.getTrackSampleOffset().then((res) => setIsAudioPlaying(Boolean(res)))
+    }, 300)
+    return () => {
+      clearInterval(mountAudioInterval)
+    }
+  }, [])
+  useEffect(() => {
     toast('Fetching conversation history from Neon...')
     fetch('/api/c?id=' + slug)
       .then((res) => res.json())
@@ -365,12 +376,12 @@ export default function () {
         {isConnected && (
           <Button
             iconPosition={'start'}
-            disabled={!isConnected}
             onMouseUp={stopRecording}
             onMouseDown={startRecording}
-            icon={isRecording ? StopCircle : PlayCircle}
-            label={isRecording ? 'Release to send' : 'Hold to speak'}
+            disabled={!isConnected || isAudioPlaying}
+            icon={isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
             buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
+            label={isAudioPlaying ? 'Audio is playing' : isRecording ? 'Release to send' : 'Hold to speak'}
           />
         )}
         <Button

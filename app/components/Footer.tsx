@@ -21,7 +21,7 @@ export default function () {
           .
         </div>
         <div className="hidden sm:flex flex-row items-center gap-x-3">
-          <Link href="https://twitter.com/neondatabase" target="_blank" className="group">
+          <Link href="https://x.com/neondatabase" target="_blank" className="group">
             <Twitter className="size-4 group-hover:fill-gray-200" />
           </Link>
           <Link href="https://github.com/neondatabase-labs/voice-thingy" target="_blank" className="group">

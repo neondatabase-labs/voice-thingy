@@ -1,5 +1,5 @@
 {
-  "name": "voice-thingy",
+  "name": "voice-thingy-with-braintrust-neon",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

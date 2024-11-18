@@ -5,7 +5,7 @@ export default {
   title: 'Voice Thingy',
   description: 'Voice led interactions with AI.',
   lnkd: 'https://www.linkedin.com/company/neon-inc/',
-  x: 'https://twitter.com/neondatabase/',
+  x: 'https://x.com/neondatabase/',
   yt: 'https://www.youtube.com/channel/UCoMzQTJSIr7-RU1QbomQI2w',
   discord: 'https://discord.gg/92vNTzKDGp',
   brand: '#00e599',
