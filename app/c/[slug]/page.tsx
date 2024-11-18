@@ -389,8 +389,8 @@ export default function () {
           disabled={loadingMessages}
           icon={isConnected ? X : Mic}
           iconPosition={isConnected ? 'end' : 'start'}
-          label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
           onClick={isConnected ? disconnectConversation : connectConversation}
+          label={isConnected ? 'End the conversation' : 'Start the conversation'}
           buttonStyle={isConnected ? 'border border-red-500 text-xs text-red-500' : 'bg-[#00e599] text-black'}
         />
         <div className="flex flex-col items-center gap-y-2 min-w-[150px] min-h-[300px]">
