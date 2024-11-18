@@ -17,7 +17,8 @@
 ## Cloning & running
 
 1. Clone the repo: `git clone https://github.com/neondatabase-labs/voice-thingy`
-2. Create a `.env` file and add the following environment variables:
+2. On https://www.braintrust.dev/app/settings/secrets, set your `OPENAI_API_KEY`.
+3. Create a `.env` file and add the following environment variables:
 
 ```
 # Grab a connection string from https://console.neon.tech
