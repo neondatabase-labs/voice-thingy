@@ -28,4 +28,5 @@ BRAINTRUST_API_KEY="sk-xlKWNORh5P4zOneLDeYq78VQqed9WBmIKSHddl7WDbHXh107"
 ```
 
 3. In [Braintrust's Settings](https://www.braintrust.dev/app/settings/secrets), set your `OPENAI_API_KEY`.
-4. Run `pnpm install` and `pnpm dev` to install dependencies and run locally.
+4. Run `pnpm install` and `pnpm schema` to install dependencies and set the relevant schema in your Neon database.
+5. Run `pnpm dev` to run the application locally.
