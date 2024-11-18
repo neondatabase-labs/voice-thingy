@@ -74,6 +74,7 @@ export default function () {
   const [isConnected, setIsConnected] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [messages, setMessages] = useState<ItemType[]>([])
+  const [allowTheButton, setAllowTheButton] = useState(true)
   const [loadingMessages, setLoadingMessages] = useState<boolean>(true)
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([])
   /**
@@ -109,6 +110,7 @@ export default function () {
       if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
       toast('You ready to chat with AI.')
     } else toast('Failed to prepare chat with AI.')
+    setAllowTheButton(false)
   }, [messages, clientRef.current])
   /**
    * Disconnect and reset conversation state
@@ -325,9 +327,7 @@ export default function () {
       // @ts-ignore
       wavStreamPlayerRef.current.getTrackSampleOffset().then((res) => setIsAudioPlaying(Boolean(res)))
     }, 10)
-    return () => {
-      clearInterval(mountAudioInterval)
-    }
+    return () => clearInterval(mountAudioInterval)
   }, [])
   useEffect(() => {
     toast('Fetching conversation history from Neon...')
@@ -358,11 +358,11 @@ export default function () {
       {isConnected && (
         <Button
           iconPosition="start"
-          disabled={!isConnected || isAudioPlaying}
           onClick={isRecording ? stopRecording : startRecording}
-          icon={isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
+          disabled={allowTheButton || !isConnected || isAudioPlaying}
           buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
-          label={isAudioPlaying ? 'Audio is playing' : isRecording ? 'Recording...' : 'Click to speak'}
+          icon={allowTheButton ? null : isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
+          label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Recording...' : 'Click to speak'}
         />
       )}
       <Button

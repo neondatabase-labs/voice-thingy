@@ -5,7 +5,7 @@ import React from 'react'
 import { Icon } from 'react-feather'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: Icon
+  icon?: Icon | null
   label?: string
   iconFill?: boolean
   buttonStyle?: string
@@ -13,7 +13,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconColor?: 'red' | 'green' | 'grey'
 }
 
-export default function ({ label = 'Okay', icon = void 0, iconPosition = 'start', iconColor = void 0, iconFill = false, buttonStyle, ...rest }: ButtonProps) {
+export default function ({ label = 'Okay', icon = null, iconPosition = 'start', iconColor = void 0, iconFill = false, buttonStyle, ...rest }: ButtonProps) {
   const EndIcon = iconPosition === 'end' ? icon : null
   const StartIcon = iconPosition === 'start' ? icon : null
   return (
