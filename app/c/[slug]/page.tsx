@@ -25,7 +25,6 @@ import clsx from 'clsx'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Mic, PlayCircle, Radio, StopCircle, X } from 'react-feather'
-import NoSSR from 'react-no-ssr'
 import { toast } from 'sonner'
 
 function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data: Float32Array, color: string, pointCount: number = 0, barWidth: number = 0, barSpacing: number = 0, center: boolean = false) {
@@ -355,43 +354,41 @@ export default function () {
    * Render the application
    */
   return (
-    <NoSSR>
-      <div className="flex flex-col items-center justify-center w-screen min-h-[calc(100vh-90px)]">
-        {isConnected && (
-          <Button
-            iconPosition="start"
-            disabled={!isConnected || isAudioPlaying}
-            onClick={isRecording ? stopRecording : startRecording}
-            icon={isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
-            buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
-            label={isAudioPlaying ? 'Audio is playing' : isRecording ? 'Recording...' : 'Click to speak'}
-          />
-        )}
+    <div className="flex flex-col items-center justify-center w-screen min-h-[calc(100vh-90px)]">
+      {isConnected && (
         <Button
-          disabled={loadingMessages}
-          icon={isConnected ? X : Mic}
-          iconPosition={isConnected ? 'end' : 'start'}
-          label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
-          onClick={isConnected ? disconnectConversation : connectConversation}
-          buttonStyle={isConnected ? 'mt-4 bg-red-600 text-white' : 'mt-4 bg-[#00e599] text-black'}
+          iconPosition="start"
+          disabled={!isConnected || isAudioPlaying}
+          onClick={isRecording ? stopRecording : startRecording}
+          icon={isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
+          buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
+          label={isAudioPlaying ? 'Audio is playing' : isRecording ? 'Recording...' : 'Click to speak'}
         />
-        <div className={clsx(!isRecording && 'hidden', 'contents')}>
-          <canvas ref={clientCanvasRef} />
-        </div>
-        <div className={clsx(isRecording && 'hidden', 'contents')}>
-          <canvas ref={serverCanvasRef} />
-        </div>
-        {[...messages, ...items].length > 0 && (
-          <div className="mt-24 flex flex-col border-b">
-            <span className="border-b text-sm">Transcript</span>
-            <div data-conversation-content className="mt-2 flex flex-col p-4 gap-y-4 overflow-y-scroll max-h-[300px]">
-              {[...messages, ...items].map((conversationItem) => (
-                <Message key={conversationItem.id} conversationItem={conversationItem} />
-              ))}
-            </div>
-          </div>
-        )}
+      )}
+      <Button
+        disabled={loadingMessages}
+        icon={isConnected ? X : Mic}
+        iconPosition={isConnected ? 'end' : 'start'}
+        label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
+        onClick={isConnected ? disconnectConversation : connectConversation}
+        buttonStyle={isConnected ? 'mt-4 bg-red-600 text-white' : 'mt-4 bg-[#00e599] text-black'}
+      />
+      <div className={clsx(!isRecording && 'hidden', 'contents')}>
+        <canvas ref={clientCanvasRef} />
       </div>
-    </NoSSR>
+      <div className={clsx(isRecording && 'hidden', 'contents')}>
+        <canvas ref={serverCanvasRef} />
+      </div>
+      {[...messages, ...items].length > 0 && (
+        <div className="mt-24 flex flex-col border-b">
+          <span className="border-b text-sm">Transcript</span>
+          <div data-conversation-content className="mt-2 flex flex-col p-4 gap-y-4 overflow-y-scroll max-h-[300px]">
+            {[...messages, ...items].map((conversationItem) => (
+              <Message key={conversationItem.id} conversationItem={conversationItem} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

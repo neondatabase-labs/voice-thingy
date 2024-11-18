@@ -31,9 +31,6 @@ importers:
       react-feather:
         specifier: ^2.0.10
         version: 2.0.10(react@19.0.0-rc-66855b96-20241106)
-      react-no-ssr:
-        specifier: ^1.1.0
-        version: 1.1.0(react@19.0.0-rc-66855b96-20241106)
       sonner:
         specifier: ^1.7.0
         version: 1.7.0(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
@@ -47,9 +44,6 @@ importers:
       '@types/react':
         specifier: 18.3.12
         version: 18.3.12
-      '@types/react-no-ssr':
-        specifier: ^1.1.7
-        version: 1.1.7
       '@types/ws':
         specifier: ^8.5.13
         version: 8.5.13
@@ -446,9 +440,6 @@ packages:
   '@types/prop-types@15.7.13':
     resolution: { integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA== }
 
-  '@types/react-no-ssr@1.1.7':
-    resolution: { integrity: sha512-ccIthMjeaplgCSv5hNvMsP27RVYpga5E5Nog7nkNaMLkvw3Q4wfVHtJPel/SisNVoXr/6mI8O/gv8A58maipsA== }
-
   '@types/react@18.3.12':
     resolution: { integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw== }
 
@@ -484,9 +475,6 @@ packages:
   autoprefixer@9.8.8:
     resolution: { integrity: sha512-eM9d/swFopRt5gdJ7jrpCwgvEMIayITpojhkkSMRsFHYuH5bkSQ4p/9qTEHtmNudUZh22Tehu7I6CxAW0IXTKA== }
     hasBin: true
-
-  babel-runtime@6.26.0:
-    resolution: { integrity: sha512-ITKNuq2wKlW1fJg9sSW52eepoYgZBggvOAHC0u/CYu/qxQ9EVzThCgR69BnSXLHjy2f7SY5zaQ4yt7H9ZVxY2g== }
 
   balanced-match@1.0.2:
     resolution: { integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw== }
@@ -546,10 +534,6 @@ packages:
   commander@4.1.1:
     resolution: { integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA== }
     engines: { node: '>= 6' }
-
-  core-js@2.6.12:
-    resolution: { integrity: sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ== }
-    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
 
   cross-spawn@7.0.5:
     resolution: { integrity: sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug== }
@@ -972,11 +956,6 @@ packages:
   react-is@16.13.1:
     resolution: { integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ== }
 
-  react-no-ssr@1.1.0:
-    resolution: { integrity: sha512-3td8iPIEFKWXOJ3Ar5xURvZAsv/aIlngJLBH6fP5QC3WhsfuO2pn7WQR0ZlkTE0puWCL0RDEvXtOfAg4qMp+xA== }
-    peerDependencies:
-      react: ^0.14.0 || ^15.0.0
-
   react@19.0.0-rc-66855b96-20241106:
     resolution: { integrity: sha512-klH7xkT71SxRCx4hb1hly5FJB21Hz0ACyxbXYAECEqssUjtJeFUAaI2U1DgJAzkGEnvEm3DkxuBchMC/9K4ipg== }
     engines: { node: '>=0.10.0' }
@@ -987,9 +966,6 @@ packages:
   readdirp@3.6.0:
     resolution: { integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA== }
     engines: { node: '>=8.10.0' }
-
-  regenerator-runtime@0.11.1:
-    resolution: { integrity: sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg== }
 
   resolve-pkg-maps@1.0.0:
     resolution: { integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw== }
@@ -1413,10 +1389,6 @@ snapshots:
 
   '@types/prop-types@15.7.13': {}
 
-  '@types/react-no-ssr@1.1.7':
-    dependencies:
-      '@types/react': 18.3.12
-
   '@types/react@18.3.12':
     dependencies:
       '@types/prop-types': 15.7.13
@@ -1454,11 +1426,6 @@ snapshots:
       picocolors: 0.2.1
       postcss: 7.0.39
       postcss-value-parser: 4.2.0
-
-  babel-runtime@6.26.0:
-    dependencies:
-      core-js: 2.6.12
-      regenerator-runtime: 0.11.1
 
   balanced-match@1.0.2: {}
 
@@ -1522,8 +1489,6 @@ snapshots:
     optional: true
 
   commander@4.1.1: {}
-
-  core-js@2.6.12: {}
 
   cross-spawn@7.0.5:
     dependencies:
@@ -1867,11 +1832,6 @@ snapshots:
 
   react-is@16.13.1: {}
 
-  react-no-ssr@1.1.0(react@19.0.0-rc-66855b96-20241106):
-    dependencies:
-      babel-runtime: 6.26.0
-      react: 19.0.0-rc-66855b96-20241106
-
   react@19.0.0-rc-66855b96-20241106: {}
 
   read-cache@1.0.0:
@@ -1881,8 +1841,6 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
-
-  regenerator-runtime@0.11.1: {}
 
   resolve-pkg-maps@1.0.0: {}
 

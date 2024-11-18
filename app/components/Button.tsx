@@ -18,17 +18,9 @@ export default function ({ label = 'Okay', icon = void 0, iconPosition = 'start'
   const StartIcon = iconPosition === 'start' ? icon : null
   return (
     <button {...rest} className={clsx('flex max-w-max flex-row items-center gap-x-2 rounded-md px-5 py-2', buttonStyle || 'bg-black text-white')}>
-      {StartIcon && (
-        <span>
-          <StartIcon width={16} height={16} />
-        </span>
-      )}
+      {StartIcon && <StartIcon width={16} height={16} />}
       <span>{label}</span>
-      {EndIcon && (
-        <span>
-          <EndIcon width={16} height={16} />
-        </span>
-      )}
+      {EndIcon && <EndIcon width={16} height={16} />}
     </button>
   )
 }
