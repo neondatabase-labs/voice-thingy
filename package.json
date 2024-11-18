@@ -18,13 +18,11 @@
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-feather": "^2.0.10",
     "react-no-ssr": "^1.1.0",
-    "save": "^2.9.0",
     "sonner": "^1.7.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/node": "22.9.0",
-    "@types/pg": "^8.11.10",
     "@types/react": "18.3.12",
     "@types/react-no-ssr": "^1.1.7",
     "@types/ws": "^8.5.13",

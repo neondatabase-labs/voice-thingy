@@ -26,5 +26,6 @@ DATABASE_URL="postgresql://neondb_owner:...@ep-...us-east-1.aws.neon.tech/neondb
 # Grab API Key from https://www.braintrust.dev/app/settings/api-keys
 BRAINTRUST_API_KEY="sk-xlKWNORh5P4zOneLDeYq78VQqed9WBmIKSHddl7WDbHXh107"
 ```
+
 3. In [Braintrust's Settings](https://www.braintrust.dev/app/settings/secrets), set your `OPENAI_API_KEY`.
 4. Run `pnpm install` and `pnpm dev` to install dependencies and run locally.
