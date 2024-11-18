@@ -362,7 +362,7 @@ export default function () {
           disabled={allowTheButton || !isConnected || isAudioPlaying}
           buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
           icon={allowTheButton ? null : isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
-          label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Recording...' : 'Click to speak'}
+          label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Stop recording audio' : 'Click to speak'}
         />
       )}
       <Button
