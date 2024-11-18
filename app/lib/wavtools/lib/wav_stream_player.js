@@ -27,9 +27,7 @@ export class WavStreamPlayer {
    */
   async connect() {
     this.context = new AudioContext({ sampleRate: this.sampleRate })
-    if (this.context.state === 'suspended') {
-      await this.context.resume()
-    }
+    if (this.context.state === 'suspended') await this.context.resume()
     try {
       await this.context.audioWorklet.addModule(this.scriptSrc)
     } catch (e) {
@@ -51,9 +49,7 @@ export class WavStreamPlayer {
    * @returns {import('./analysis/audio_analysis.js').AudioAnalysisOutputType}
    */
   getFrequencies(analysisType = 'frequency', minDecibels = -100, maxDecibels = -30) {
-    if (!this.analyser) {
-      throw new Error('Not connected, please call .connect() first')
-    }
+    if (!this.analyser) throw new Error('Not connected, please call .connect() first')
     return AudioAnalysis.getFrequencies(this.analyser, this.sampleRate, null, analysisType, minDecibels, maxDecibels)
   }
 
@@ -90,22 +86,13 @@ export class WavStreamPlayer {
    * @returns {Int16Array}
    */
   add16BitPCM(arrayBuffer, trackId = 'default') {
-    if (typeof trackId !== 'string') {
-      throw new Error(`trackId must be a string`)
-    } else if (this.interruptedTrackIds[trackId]) {
-      return
-    }
-    if (!this.stream) {
-      this._start()
-    }
+    if (typeof trackId !== 'string') throw new Error(`trackId must be a string`)
+    else if (this.interruptedTrackIds[trackId]) return
+    if (!this.stream) this._start()
     let buffer
-    if (arrayBuffer instanceof Int16Array) {
-      buffer = arrayBuffer
-    } else if (arrayBuffer instanceof ArrayBuffer) {
-      buffer = new Int16Array(arrayBuffer)
-    } else {
-      throw new Error(`argument must be Int16Array or ArrayBuffer`)
-    }
+    if (arrayBuffer instanceof Int16Array) buffer = arrayBuffer
+    else if (arrayBuffer instanceof ArrayBuffer) buffer = new Int16Array(arrayBuffer)
+    else throw new Error(`argument must be Int16Array or ArrayBuffer`)
     this.stream.port.postMessage({ event: 'write', buffer, trackId })
     return buffer
   }
@@ -116,9 +103,7 @@ export class WavStreamPlayer {
    * @returns {{trackId: string|null, offset: number, currentTime: number}}
    */
   async getTrackSampleOffset(interrupt = false) {
-    if (!this.stream) {
-      return null
-    }
+    if (!this.stream) return null
     const requestId = crypto.randomUUID()
     this.stream.port.postMessage({
       event: interrupt ? 'interrupt' : 'offset',
@@ -130,9 +115,7 @@ export class WavStreamPlayer {
       await new Promise((r) => setTimeout(() => r(), 1))
     }
     const { trackId } = trackSampleOffset
-    if (interrupt && trackId) {
-      this.interruptedTrackIds[trackId] = true
-    }
+    if (interrupt && trackId) this.interruptedTrackIds[trackId] = true
     return trackSampleOffset
   }
 

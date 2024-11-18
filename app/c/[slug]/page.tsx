@@ -174,6 +174,9 @@ export default function () {
       return tmp
     }
   }
+  /*
+   * Sync conversation to Neon database
+   */
   const syncConversation = async (items: ItemType[]) => {
     try {
       const [tmp_1, tmp_2] = await Promise.all([syncConversationItem({ ...items[items.length - 1] }), syncConversationItem({ ...items[items.length - 2] })])
@@ -280,7 +283,6 @@ export default function () {
    * Core RealtimeClient and audio capture setup
    * Set all of our instructions, tools, events and more
    */
-  // @ts-ignore
   useEffect(() => {
     // Get refs
     const wavStreamPlayer = wavStreamPlayerRef.current
@@ -322,10 +324,13 @@ export default function () {
       if (client) client.reset()
     }
   }, [clientRef.current])
+  /**
+   * Set if the audio is playing per the current track offset
+   */
   useEffect(() => {
-    let mountAudioInterval = setInterval(() => {
-      // @ts-ignore
-      wavStreamPlayerRef.current.getTrackSampleOffset().then((res) => setIsAudioPlaying(Boolean(res)))
+    let mountAudioInterval = setInterval(async () => {
+      const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
+      setIsAudioPlaying(Boolean(res))
     }, 10)
     return () => clearInterval(mountAudioInterval)
   }, [])
