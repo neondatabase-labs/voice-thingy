@@ -17,14 +17,14 @@
 ## Cloning & running
 
 1. Clone the repo: `git clone https://github.com/neondatabase-labs/voice-thingy`
-2. On https://www.braintrust.dev/app/settings/secrets, set your `OPENAI_API_KEY`.
-3. Create a `.env` file and add the following environment variables:
+2. Create a `.env` file and add the following environment variables:
 
 ```
 # Grab a connection string from https://console.neon.tech
 DATABASE_URL="postgresql://neondb_owner:...@ep-...us-east-1.aws.neon.tech/neondb?sslmode=require"
+
 # Grab API Key from https://www.braintrust.dev/app/settings/api-keys
 BRAINTRUST_API_KEY="sk-xlKWNORh5P4zOneLDeYq78VQqed9WBmIKSHddl7WDbHXh107"
 ```
-
-3. Run `pnpm install` and `pnpm dev` to install dependencies and run locally.
+3. In [Braintrust's Settings](https://www.braintrust.dev/app/settings/secrets), set your `OPENAI_API_KEY`.
+4. Run `pnpm install` and `pnpm dev` to install dependencies and run locally.
