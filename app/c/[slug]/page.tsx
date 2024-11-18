@@ -11,7 +11,7 @@
  * You can run it with `pnpm relay`, in parallel with `pnpm start`
  */
 
-const LOCAL_RELAY_SERVER_URL = process.env.NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL as string
+const LOCAL_RELAY_SERVER_URL = (process.env.NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL as string) || 'https://braintrustproxy.com/v1/realtime'
 
 import Button from '@/components/Button'
 import Message from '@/components/Message'
@@ -64,18 +64,6 @@ export default function () {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
-  useEffect(() => {
-    toast('Setting up OpenAI Realtime (with Braintrust)...')
-    fetch('/api/i', { method: 'POST' })
-      .then((res) => res.json())
-      .then((res) => {
-        toast('Succesfully set up OpenAI Realtime client.')
-        clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true })
-      })
-      .catch(() => {
-        toast('Failed to set up OpenAI Realtime client :/')
-      })
-  }, [])
   /**
    * References for
    * - Rendering audio visualization (canvas)
@@ -99,17 +87,6 @@ export default function () {
   const [loadingMessages, setLoadingMessages] = useState<boolean>(true)
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([])
   /**
-   * When you click the API key
-   */
-  // const resetAPIKey = useCallback(() => {
-  //   const apiKey = prompt('OpenAI API Key')
-  //   if (apiKey !== null) {
-  //     localStorage.clear()
-  //     localStorage.setItem('tmp::voice_api_key', apiKey)
-  //     window.location.reload()
-  //   }
-  // }, [])
-  /**
    * Connect to conversation:
    * WavRecorder taks speech input, WavStreamPlayer output, client is API client
    */
@@ -130,6 +107,7 @@ export default function () {
     if (client) {
       await client.connect()
       if (messages.length < 1) {
+        setIsAudioPlaying(true)
         client.sendUserMessageContent([
           {
             type: `input_text`,
@@ -181,20 +159,6 @@ export default function () {
     if (client) client.createResponse()
   }
   /**
-   * Auto-scroll the event logs
-   */
-  useEffect(() => {
-    if (eventsScrollRef.current) {
-      const eventsEl = eventsScrollRef.current
-      const scrollHeight = eventsEl.scrollHeight
-      // Only scroll if height has just changed
-      if (scrollHeight !== eventsScrollHeightRef.current) {
-        eventsEl.scrollTop = scrollHeight
-        eventsScrollHeightRef.current = scrollHeight
-      }
-    }
-  }, [realtimeEvents, clientRef.current])
-  /**
    * Auto-scroll the conversation logs
    */
   const syncConversationItem = async (tmp: any) => {
@@ -238,6 +202,33 @@ export default function () {
       console.error(e)
     }
   }
+  // Call the APIs to set the OpenAI Realtime with Braintrust (Short-lived tokens)
+  useEffect(() => {
+    toast('Setting up OpenAI Realtime (with Braintrust)...')
+    fetch('/api/i', { method: 'POST' })
+      .then((res) => res.json())
+      .then((res) => {
+        toast('Succesfully set up OpenAI Realtime client.')
+        clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true })
+      })
+      .catch(() => {
+        toast('Failed to set up OpenAI Realtime client :/')
+      })
+  }, [])
+  /**
+   * Auto-scroll the event logs
+   */
+  useEffect(() => {
+    if (eventsScrollRef.current) {
+      const eventsEl = eventsScrollRef.current
+      const scrollHeight = eventsEl.scrollHeight
+      // Only scroll if height has just changed
+      if (scrollHeight !== eventsScrollHeightRef.current) {
+        eventsEl.scrollTop = scrollHeight
+        eventsScrollHeightRef.current = scrollHeight
+      }
+    }
+  }, [realtimeEvents, clientRef.current])
   useEffect(() => {
     syncConversation(items)
     const conversationEls = [].slice.call(document.body.querySelectorAll('[data-conversation-content]'))
