@@ -52,7 +52,7 @@ export default function () {
    * - RealtimeClient (API client)
    */
   const clientRef = useRef<RealtimeClient>()
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
   /**
@@ -82,6 +82,7 @@ export default function () {
    * WavRecorder taks speech input, WavStreamPlayer output, client is API client
    */
   const connectConversation = useCallback(async () => {
+    toast('Setting up the conversation...')
     const client = clientRef.current
     const wavRecorder = wavRecorderRef.current
     const wavStreamPlayer = wavStreamPlayerRef.current
@@ -97,8 +98,8 @@ export default function () {
     // Connect to realtime API
     if (client) {
       await client.connect()
+      console.log(messages)
       if (messages.length < 1) {
-        setIsAudioPlaying(true)
         client.sendUserMessageContent([
           {
             type: `input_text`,
@@ -107,7 +108,8 @@ export default function () {
         ])
       }
       if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
-    }
+      toast('You ready to chat with AI.')
+    } else toast('Failed to prepare chat with AI.')
   }, [messages, clientRef.current])
   /**
    * Disconnect and reset conversation state
