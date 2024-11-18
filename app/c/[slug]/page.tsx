@@ -366,15 +366,12 @@ export default function () {
       <div className="flex flex-col items-center justify-center w-screen min-h-[calc(100vh-90px)]">
         {isConnected && (
           <Button
-            iconPosition={'start'}
-            onMouseUp={stopRecording}
-            onTouchEnd={stopRecording}
-            onMouseDown={startRecording}
-            onTouchStart={startRecording}
+            iconPosition="start"
             disabled={!isConnected || isAudioPlaying}
+            onClick={isRecording ? stopRecording : startRecording}
             icon={isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
             buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
-            label={isAudioPlaying ? 'Audio is playing' : isRecording ? 'Release to send' : 'Hold to speak'}
+            label={isAudioPlaying ? 'Audio is playing' : isRecording ? 'Recording...' : 'Click to speak'}
           />
         )}
         <Button
