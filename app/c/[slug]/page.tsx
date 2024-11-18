@@ -22,15 +22,16 @@ import { WavRecorder, WavStreamPlayer } from '@/lib/wavtools/index.js'
 import { RealtimeClient } from '@openai/realtime-api-beta'
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
 import clsx from 'clsx'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Mic, PlayCircle, Radio, StopCircle, X } from 'react-feather'
 import { toast } from 'sonner'
 
-function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data: Float32Array, color: string, pointCount: number = 0, barWidth: number = 0, barSpacing: number = 0, center: boolean = false) {
+function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data: Float32Array, color: string, pointCount: number = 0, barWidth: number = 200, barSpacing: number = 2, center: boolean = false) {
   pointCount = Math.floor(Math.min(pointCount, (canvas.width - barSpacing) / (Math.max(barWidth, 1) + barSpacing)))
   if (!pointCount) pointCount = Math.floor((canvas.width - barSpacing) / (Math.max(barWidth, 1) + barSpacing))
-  if (!barWidth) barWidth = (canvas.width - barSpacing) / pointCount - barSpacing
+  if (!barWidth) barWidth = 200
   const points = normalizeArray(data, pointCount, true)
   for (let i = 0; i < pointCount; i++) {
     const amplitude = Math.abs(points[i])
@@ -75,8 +76,10 @@ export default function () {
   const [isRecording, setIsRecording] = useState(false)
   const [messages, setMessages] = useState<ItemType[]>([])
   const [allowTheButton, setAllowTheButton] = useState(true)
+  const [isTranscriptOpen, setIsTranscriptOpen] = useState(false)
   const [loadingMessages, setLoadingMessages] = useState<boolean>(true)
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([])
+
   /**
    * Connect to conversation:
    * WavRecorder taks speech input, WavStreamPlayer output, client is API client
@@ -86,19 +89,14 @@ export default function () {
     const client = clientRef.current
     const wavRecorder = wavRecorderRef.current
     const wavStreamPlayer = wavStreamPlayerRef.current
-    // Set state variables
     startTimeRef.current = new Date().toISOString()
     setIsConnected(true)
     setRealtimeEvents([])
     if (client) setItems(client.conversation.getItems())
-    // Connect to microphone
     await wavRecorder.begin()
-    // Connect to audio output
     await wavStreamPlayer.connect()
-    // Connect to realtime API
     if (client) {
       await client.connect()
-      console.log(messages)
       if (messages.length < 1) {
         client.sendUserMessageContent([
           {
@@ -112,20 +110,18 @@ export default function () {
     } else toast('Failed to prepare chat with AI.')
     setAllowTheButton(false)
   }, [messages, clientRef.current])
+
   /**
    * Disconnect and reset conversation state
    */
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false)
-    // setRealtimeEvents([])
-    // setItems([])
     const client = clientRef.current
     if (client) client.disconnect()
     const wavRecorder = wavRecorderRef.current
     await wavRecorder.end()
-    // const wavStreamPlayer = wavStreamPlayerRef.current
-    // await wavStreamPlayer.interrupt()
   }, [clientRef.current])
+
   /**
    * In push-to-talk mode, start recording
    * .appendInputAudio() for each sample
@@ -142,6 +138,7 @@ export default function () {
     }
     if (client) await wavRecorder.record((data) => client.appendInputAudio(data.mono))
   }
+
   /**
    * In push-to-talk mode, stop recording
    */
@@ -152,6 +149,7 @@ export default function () {
     await wavRecorder.pause()
     if (client) client.createResponse()
   }
+
   /**
    * Auto-scroll the conversation logs
    */
@@ -174,6 +172,7 @@ export default function () {
       return tmp
     }
   }
+
   /*
    * Sync conversation to Neon database
    */
@@ -199,7 +198,7 @@ export default function () {
       console.error(e)
     }
   }
-  // Call the APIs to set the OpenAI Realtime with Braintrust (Short-lived tokens)
+
   useEffect(() => {
     toast('Setting up OpenAI Realtime (with Braintrust)...')
     fetch('/api/i', { method: 'POST' })
@@ -212,6 +211,7 @@ export default function () {
         toast('Failed to set up OpenAI Realtime client :/')
       })
   }, [])
+
   /**
    * Auto-scroll the event logs
    */
@@ -219,13 +219,13 @@ export default function () {
     if (eventsScrollRef.current) {
       const eventsEl = eventsScrollRef.current
       const scrollHeight = eventsEl.scrollHeight
-      // Only scroll if height has just changed
       if (scrollHeight !== eventsScrollHeightRef.current) {
         eventsEl.scrollTop = scrollHeight
         eventsScrollHeightRef.current = scrollHeight
       }
     }
   }, [realtimeEvents, clientRef.current])
+
   useEffect(() => {
     syncConversation(items)
     const conversationEls = [].slice.call(document.body.querySelectorAll('[data-conversation-content]'))
@@ -234,6 +234,7 @@ export default function () {
       conversationEl.scrollTop = conversationEl.scrollHeight
     }
   }, [items, clientRef.current])
+
   /**
    * Set up render loops for the visualization canvas
    */
@@ -256,7 +257,7 @@ export default function () {
           if (clientCtx) {
             clientCtx.clearRect(0, 0, clientCanvas.width, clientCanvas.height)
             const result = wavRecorder.recording ? wavRecorder.getFrequencies('voice') : { values: new Float32Array([0]) }
-            drawBars(clientCanvas, clientCtx, result.values, '#00e599', 10, 0, 8)
+            drawBars(clientCanvas, clientCtx, result.values, '#00e599', 200, 2, 2, false)
           }
         }
         if (serverCanvas) {
@@ -268,7 +269,7 @@ export default function () {
           if (serverCtx) {
             serverCtx.clearRect(0, 0, serverCanvas.width, serverCanvas.height)
             const result = wavStreamPlayer.analyser ? wavStreamPlayer.getFrequencies('voice') : { values: new Float32Array([0]) }
-            drawBars(serverCanvas, serverCtx, result.values, '#009900', 10, 0, 8)
+            drawBars(serverCanvas, serverCtx, result.values, '#9333ea', 200, 2, 2, false)
           }
         }
         window.requestAnimationFrame(render)
@@ -279,25 +280,21 @@ export default function () {
       isLoaded = false
     }
   }, [clientRef.current])
+
   /**
    * Core RealtimeClient and audio capture setup
    * Set all of our instructions, tools, events and more
    */
   useEffect(() => {
-    // Get refs
     const wavStreamPlayer = wavStreamPlayerRef.current
     const client = clientRef.current
     if (client) {
-      // Set instructions
       client.updateSession({ instructions: instructions })
-      // Set transcription, otherwise we don't get user transcriptions back
       client.updateSession({ input_audio_transcription: { model: 'whisper-1' } })
-      // handle realtime events from client + server for event logging
       client.on('realtime.event', (realtimeEvent: RealtimeEvent) => {
         setRealtimeEvents((realtimeEvents) => {
           const lastEvent = realtimeEvents[realtimeEvents.length - 1]
           if (lastEvent?.event.type === realtimeEvent.event.type) {
-            // if we receive multiple events in a row, aggregate them for display purposes
             lastEvent.count = (lastEvent.count || 0) + 1
             return realtimeEvents.slice(0, -1).concat(lastEvent)
           }
@@ -324,6 +321,7 @@ export default function () {
       if (client) client.reset()
     }
   }, [clientRef.current])
+
   /**
    * Set if the audio is playing per the current track offset
    */
@@ -334,6 +332,7 @@ export default function () {
     }, 10)
     return () => clearInterval(mountAudioInterval)
   }, [])
+
   useEffect(() => {
     toast('Fetching conversation history from Neon...')
     fetch('/api/c?id=' + slug)
@@ -355,45 +354,65 @@ export default function () {
       .catch(() => toast('Failed to load conversation history :/'))
       .finally(() => setLoadingMessages(false))
   }, [clientRef.current])
+
   /**
    * Render the application
    */
   return (
-    <div className="flex flex-col items-center justify-center w-screen min-h-[calc(100vh-90px)]">
-      {isConnected && (
+    <>
+      <header className="w-full border-b py-1 flex flex-col items-center px-8">
+        <div className="w-full flex flex-row items-center justify-between max-w-7xl">
+          <Link href="/">
+            <span className="text-purple-600">Voice</span>Thingy
+          </Link>
+          <button className="text-sm" onClick={() => setIsTranscriptOpen(!isTranscriptOpen)}>
+            Show Transcript
+          </button>
+        </div>
+      </header>
+      <div className="mt-8 flex flex-col w-screen items-center justify-center gap-4 min-h-[calc(100vh-120px)] max-w-7xl">
+        {isConnected && (
+          <Button
+            iconPosition="start"
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={allowTheButton || !isConnected || isAudioPlaying}
+            buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
+            icon={allowTheButton ? null : isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
+            label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Stop recording audio' : 'Click to speak'}
+          />
+        )}
         <Button
-          iconPosition="start"
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={allowTheButton || !isConnected || isAudioPlaying}
-          buttonStyle={isRecording ? 'bg-rose-100 text-black' : 'bg-blue-100 text-black'}
-          icon={allowTheButton ? null : isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
-          label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Stop recording audio' : 'Click to speak'}
+          disabled={loadingMessages}
+          icon={isConnected ? X : Mic}
+          iconPosition={isConnected ? 'end' : 'start'}
+          label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
+          onClick={isConnected ? disconnectConversation : connectConversation}
+          buttonStyle={isConnected ? 'bg-red-600 text-white' : 'bg-[#00e599] text-black'}
         />
-      )}
-      <Button
-        disabled={loadingMessages}
-        icon={isConnected ? X : Mic}
-        iconPosition={isConnected ? 'end' : 'start'}
-        label={isConnected ? 'Disconnect Audio' : 'Connect Audio'}
-        onClick={isConnected ? disconnectConversation : connectConversation}
-        buttonStyle={isConnected ? 'mt-4 bg-red-600 text-white' : 'mt-4 bg-[#00e599] text-black'}
-      />
-      <div className={clsx(!isRecording && 'hidden', 'contents')}>
-        <canvas ref={clientCanvasRef} />
+        <div className="flex flex-col items-center gap-y-2">
+          <canvas className={clsx('flex flex-col', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
+          <span className={clsx('flex flex-col', (!isConnected || !isRecording) && 'hidden')}>You</span>
+          <canvas className={clsx('flex flex-col', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
+          <span className={clsx('flex flex-col', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')}>AI</span>
+        </div>
       </div>
-      <div className={clsx(isRecording && 'hidden', 'contents')}>
-        <canvas ref={serverCanvasRef} />
-      </div>
-      {[...messages, ...items].length > 0 && (
-        <div className="mt-24 flex flex-col border-b">
-          <span className="border-b text-sm">Transcript</span>
-          <div data-conversation-content className="mt-2 flex flex-col p-4 gap-y-4 overflow-y-scroll max-h-[300px]">
-            {[...messages, ...items].map((conversationItem) => (
-              <Message key={conversationItem.id} conversationItem={conversationItem} />
-            ))}
+      {isTranscriptOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-4 rounded shadow-lg max-w-[90%] max-h-[90%] overflow-y-scroll">
+            <div className="flex flex-row items-center justify-between">
+              <span>Transcript</span>
+              <button onClick={() => setIsTranscriptOpen(false)}>
+                <X />
+              </button>
+            </div>
+            <div data-conversation-content className="border-t py-4 mt-4 flex flex-col gap-y-4">
+              {[...messages, ...items].map((conversationItem) => (
+                <Message key={conversationItem.id} conversationItem={conversationItem} />
+              ))}
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

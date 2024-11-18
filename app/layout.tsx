@@ -1,10 +1,10 @@
 import '@/globals.css'
 import config from '@/lib/config'
+import clsx from 'clsx'
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
 import Footer from './components/Footer'
-import Header from './components/Header'
 
 const interFont = Inter({
   subsets: ['latin'],
@@ -35,9 +35,8 @@ export default function ({
 }>) {
   return (
     <html lang="en">
-      <body className={interFont.className}>
+      <body className={clsx(interFont.className, 'items-center flex flex-col')}>
         <Toaster />
-        <Header />
         {children}
         <Footer />
       </body>
