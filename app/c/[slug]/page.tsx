@@ -120,6 +120,8 @@ export default function () {
     if (client) client.disconnect()
     const wavRecorder = wavRecorderRef.current
     await wavRecorder.end()
+    const wavStreamPlayer = wavStreamPlayerRef.current
+    await wavStreamPlayer.interrupt()
   }, [clientRef.current])
 
   /**
