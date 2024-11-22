@@ -35,7 +35,7 @@ export default function ({
 }>) {
   return (
     <html lang="en">
-      <body className={clsx(interFont.className, 'items-center flex flex-col')}>
+      <body className={clsx(interFont.className, 'bg-black text-gray-400 items-center flex flex-col')}>
         <Toaster />
         {children}
         <Footer />

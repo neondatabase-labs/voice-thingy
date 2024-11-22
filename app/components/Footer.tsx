@@ -3,7 +3,7 @@ import { GitHub, Twitter } from 'react-feather'
 
 export default function () {
   return (
-    <footer className="w-full border-t pt-4 pb-2 px-8 flex flex-col items-center">
+    <footer className="w-full border-t border-white/10 pt-4 pb-2 px-8 flex flex-col items-center">
       <div className="w-full flex flex-row items-center justify-between max-w-7xl">
         <div className="font-medium">
           Built with{' '}

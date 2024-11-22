@@ -362,13 +362,13 @@ export default function () {
    */
   return (
     <>
-      <header className="w-full border-b py-1 flex flex-col items-center px-8">
+      <header className="w-full border-b border-white/10 py-1 flex flex-col items-center px-8">
         <div className="w-full flex flex-row items-center justify-between max-w-7xl">
           <Link href="/">
             <span className="text-purple-600">Voice</span>Thingy
           </Link>
           {[...messages, ...items].filter(Boolean).length > 0 ? (
-            <button className="text-sm" onClick={() => setIsTranscriptOpen(!isTranscriptOpen)}>
+            <button className="text-sm text-white" onClick={() => setIsTranscriptOpen(!isTranscriptOpen)}>
               Show Transcript
             </button>
           ) : (
@@ -404,7 +404,7 @@ export default function () {
       </div>
       {isTranscriptOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-4 rounded shadow-lg max-w-[90%] max-h-[90%] overflow-y-scroll">
+          <div className="bg-white text-black p-4 rounded shadow-lg max-w-[90%] max-h-[90%] overflow-y-scroll">
             <div className="flex flex-row items-center justify-between">
               <span>Transcript</span>
               <button onClick={() => setIsTranscriptOpen(false)}>
