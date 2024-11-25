@@ -400,11 +400,11 @@ export default function () {
           {/* <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
           <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} /> */}
           {isConnected && (
-            <button onMouseUp={stopRecording} onTouchEnd={stopRecording} onMouseDown={startRecording} onTouchStart={startRecording} disabled={allowTheButton || isAudioPlaying}>
+            <button onMouseUp={stopRecording} onTouchEnd={stopRecording} onMouseDown={startRecording} onTouchStart={startRecording} onTouchCancel={stopRecording} onContextMenu={(e) => e.preventDefault()} disabled={allowTheButton || isAudioPlaying}>
               {isRecording || isAudioPlaying ? (
-                <img decoding="async" fetchPriority="high" className="rounded-full size-[250px]" src={isRecording ? imageUrls[0] : imageUrls[1]} style={{ width: '250px', height: '250px', transform: `scale(${scale})` }} />
+                <img decoding="async" className="rounded-full size-[250px]" style={{ transform: `scale(${scale})` }} src={isRecording ? imageUrls[0] : imageUrls[1]} />
               ) : (
-                <img decoding="async" className="rounded-full size-[250px]" fetchPriority="high" src={imageUrls[2]} />
+                <img className="rounded-full size-[250px]" src={imageUrls[2]} />
               )}
             </button>
           )}
