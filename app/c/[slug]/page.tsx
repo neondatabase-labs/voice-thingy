@@ -368,8 +368,8 @@ export default function () {
       <div className="mt-8 flex flex-col w-screen items-center justify-center gap-4 min-h-[calc(100vh-120px)] max-w-7xl">
         {isConnected && (
           <div className="relative flex flex-col items-center">
-            <canvas className={clsx('h-[150px] w-[300px] absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
-            <canvas className={clsx('h-[150px] w-[300px] absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
+            <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
+            <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
             <div className={`absolute w-full h-full rounded-full ${isRecording ? 'bg-red-500' : 'bg-blue-500'} transition-all duration-300`} style={{ opacity: isRecording ? 0.5 : 0.3 }} />
             <div className={`absolute w-full h-full rounded-full border-4 ${isRecording ? 'border-red-800' : 'border-blue-800'} animate-pulse`} />
             <button
