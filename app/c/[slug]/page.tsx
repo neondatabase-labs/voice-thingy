@@ -78,7 +78,6 @@ export default function () {
     const wavStreamPlayer = wavStreamPlayerRef.current
     startTimeRef.current = new Date().toISOString()
     setIsConnected(true)
-    localStorage.setItem('voice_connected', '1')
     setRealtimeEvents([])
     if (client) setItems(client.conversation.getItems())
     await wavRecorder.begin()
@@ -344,7 +343,6 @@ export default function () {
       .catch(() => toast('Failed to load conversation history :/'))
       .finally(() => {
         setLoadingMessages(false)
-        if (localStorage.getItem('voice_connected') === '1') connectConversation()
       })
   }, [clientRef.current])
 
