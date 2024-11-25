@@ -41,7 +41,7 @@ export default function () {
    * - RealtimeClient (API client)
    */
   const clientRef = useRef<RealtimeClient>()
-  const [scale, setScale] = useState(1)
+  // const [scale, setScale] = useState(1)
   const [imageUrls, setImageUrls] = useState<any>([])
   const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
@@ -319,16 +319,16 @@ export default function () {
    * Set if the audio is playing per the current track offset
    */
   useEffect(() => {
-    let mountRandomInterval = setInterval(() => {
-      setScale(1 + Math.random() * 0.05)
-    }, 10)
+    // let mountRandomInterval = setInterval(() => {
+    //   setScale(1 + Math.random() * 0.05)
+    // }, 10)
     let mountAudioInterval = setInterval(async () => {
       const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
       setIsAudioPlaying(Boolean(res))
     }, 10)
     return () => {
       clearInterval(mountAudioInterval)
-      clearInterval(mountRandomInterval)
+      // clearInterval(mountRandomInterval)
     }
   }, [])
 
@@ -407,7 +407,7 @@ export default function () {
           {isConnected && (
             <button onMouseUp={stopRecording} onTouchEnd={stopRecording} onMouseDown={startRecording} onTouchStart={startRecording} onTouchCancel={stopRecording} onContextMenu={(e) => e.preventDefault()} disabled={allowTheButton || isAudioPlaying}>
               {isRecording || isAudioPlaying ? (
-                <img className="touch-none rounded-full size-[250px]" style={{ transform: `scale(${scale})` }} src={isRecording ? imageUrls[0] : imageUrls[1]} />
+                <img className="touch-none rounded-full size-[250px]" src={isRecording ? imageUrls[0] : imageUrls[1]} />
               ) : (
                 <img className="touch-none rounded-full size-[250px]" src={imageUrls[2]} />
               )}
