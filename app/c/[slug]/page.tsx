@@ -1,18 +1,5 @@
 'use client'
 
-/**
- * Running a local relay server will allow you to hide your API key
- * and run custom logic on the server
- *
- * Set the local relay server address to:
- * NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL=http://localhost:8081
- *
- * This will also require you to set OPENAI_API_KEY= in a `.env` file
- * You can run it with `pnpm relay`, in parallel with `pnpm start`
- */
-
-const LOCAL_RELAY_SERVER_URL = (process.env.NEXT_PUBLIC_LOCAL_RELAY_SERVER_URL as string) || 'https://braintrustproxy.com/v1/realtime'
-
 import Button from '@/components/Button'
 import Message from '@/components/Message'
 import instructions from '@/lib/instructions'
@@ -207,7 +194,7 @@ export default function () {
       .then((res) => res.json())
       .then((res) => {
         toast('Succesfully set up OpenAI Realtime client.')
-        clientRef.current = new RealtimeClient({ url: LOCAL_RELAY_SERVER_URL, apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true })
+        clientRef.current = new RealtimeClient({ url: 'https://braintrustproxy.com/v1/realtime', apiKey: res.apiKey, dangerouslyAllowAPIKeyInBrowser: true })
       })
       .catch(() => {
         toast('Failed to set up OpenAI Realtime client :/')
