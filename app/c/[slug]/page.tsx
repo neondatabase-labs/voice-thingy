@@ -316,7 +316,6 @@ export default function () {
    * Set if the audio is playing per the current track offset
    */
   useEffect(() => {
-    if (localStorage.getItem('voice_connected') === '1') connectConversation()
     let mountAudioInterval = setInterval(async () => {
       const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
       setIsAudioPlaying(Boolean(res))
@@ -343,7 +342,10 @@ export default function () {
         }
       })
       .catch(() => toast('Failed to load conversation history :/'))
-      .finally(() => setLoadingMessages(false))
+      .finally(() => {
+        setLoadingMessages(false)
+        if (localStorage.getItem('voice_connected') === '1') connectConversation()
+      })
   }, [clientRef.current])
 
   /**
