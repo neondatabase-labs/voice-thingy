@@ -321,7 +321,7 @@ export default function () {
   useEffect(() => {
     let mountAudioInterval = setInterval(async () => {
       const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
-      setScale(1 + Math.random() * 0.02)
+      setScale(1 + Math.random() * 0.05)
       setIsAudioPlaying(Boolean(res))
     }, 10)
     return () => clearInterval(mountAudioInterval)
