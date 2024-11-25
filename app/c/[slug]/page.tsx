@@ -10,7 +10,6 @@ import { normalizeArray } from '@/lib/utils'
 import { WavRecorder, WavStreamPlayer } from '@/lib/wavtools/index.js'
 import { RealtimeClient } from '@openai/realtime-api-beta'
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -42,6 +41,7 @@ export default function () {
    * - RealtimeClient (API client)
    */
   const clientRef = useRef<RealtimeClient>()
+  const [scale, setScale] = useState(1)
   const [imageUrls, setImageUrls] = useState<any>([])
   const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
@@ -321,6 +321,7 @@ export default function () {
   useEffect(() => {
     let mountAudioInterval = setInterval(async () => {
       const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
+      setScale(1 + Math.random() * 0.02)
       setIsAudioPlaying(Boolean(res))
     }, 10)
     return () => clearInterval(mountAudioInterval)
@@ -346,44 +347,21 @@ export default function () {
       })
       .catch(() => toast('Failed to load conversation history :/'))
       .finally(() => {
-        const cacheKey1 = 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2djbHhraW4ybmd0a2xrNmswZzcyOXh1cTF2bmd3N2N1bTBqZjN6cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jQS9YkJXofyeI/giphy.webp'
-        const cacheKey2 = 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXp5dzJyc2RxdWhwdWVmMnZmaWxkeDl2bnN0ajF1b3Vnam1sOGlsMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9JxkPTP3alOykb8PmQ/giphy.webp'
-        const cacheKey3 = '/start.png'
+        const imagesToCache = ['/red.webp', '/ai.webp', '/start.png']
         caches
           .open('images')
           .then((cache) => {
-            return Promise.all([
-              cache.match(cacheKey1).then((response) => {
-                if (response) {
-                  return response.blob().then((blob) => URL.createObjectURL(blob))
-                } else {
+            return Promise.all(
+              imagesToCache.map((cacheKey1) =>
+                cache.match(cacheKey1).then((response) => {
+                  if (response) return response.blob().then((blob) => URL.createObjectURL(blob))
                   return fetch(cacheKey1).then((res) => {
                     cache.put(cacheKey1, res.clone())
                     return res.blob().then((blob) => URL.createObjectURL(blob))
                   })
-                }
-              }),
-              cache.match(cacheKey2).then((response) => {
-                if (response) {
-                  return response.blob().then((blob) => URL.createObjectURL(blob))
-                } else {
-                  return fetch(cacheKey2).then((res) => {
-                    cache.put(cacheKey2, res.clone())
-                    return res.blob().then((blob) => URL.createObjectURL(blob))
-                  })
-                }
-              }),
-              cache.match(cacheKey3).then((response) => {
-                if (response) {
-                  return response.blob().then((blob) => URL.createObjectURL(blob))
-                } else {
-                  return fetch(cacheKey3).then((res) => {
-                    cache.put(cacheKey3, res.clone())
-                    return res.blob().then((blob) => URL.createObjectURL(blob))
-                  })
-                }
-              }),
-            ])
+                }),
+              ),
+            )
           })
           .then((urls) => {
             setImageUrls(urls)
@@ -421,15 +399,15 @@ export default function () {
         <div className="relative flex flex-col items-center">
           {/* <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
           <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} /> */}
-          <button className={clsx('appearance-none', !isConnected && 'hidden')} onMouseUp={stopRecording} onMouseDown={startRecording} disabled={allowTheButton || isAudioPlaying}>
-            {isRecording ? (
-              <img decoding="async" src={imageUrls[0]} fetchPriority="high" className="rounded-full size-[250px]" />
-            ) : isAudioPlaying ? (
-              <img decoding="async" src={imageUrls[1]} fetchPriority="high" className="rounded-full size-[250px]" />
-            ) : (
-              <img decoding="async" className="rounded-full size-[250px]" fetchPriority="high" src={imageUrls[2]} />
-            )}
-          </button>
+          {isConnected && (
+            <button onMouseUp={stopRecording} onTouchEnd={stopRecording} onMouseDown={startRecording} onTouchStart={startRecording} disabled={allowTheButton || isAudioPlaying}>
+              {isRecording || isAudioPlaying ? (
+                <img decoding="async" fetchPriority="high" className="rounded-full size-[250px]" src={isRecording ? imageUrls[0] : imageUrls[1]} style={{ width: '250px', height: '250px', transform: `scale(${scale})` }} />
+              ) : (
+                <img decoding="async" className="rounded-full size-[250px]" fetchPriority="high" src={imageUrls[2]} />
+              )}
+            </button>
+          )}
         </div>
         <Button
           disabled={loadingMessages}
