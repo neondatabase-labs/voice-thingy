@@ -353,9 +353,15 @@ export default function () {
     <>
       <header className="w-full border-b border-white/10 py-1 flex flex-col items-center px-8">
         <div className="w-full flex flex-row items-center justify-between max-w-7xl">
-          <Link href="/">
-            <span className="text-purple-600">Voice</span>Thingy
-          </Link>
+          <div className="flex flex-row items-center gap-x-1">
+            <Link href="https://neon.tech" target="_blank">
+              <img className="h-[20px] w-auto" loading="lazy" decoding="async" width="158" height="45" src="https://neon.tech/brand/neon-logo-dark-color.svg" />
+            </Link>
+            <div className="w-[18px] h-[1px] bg-white/40 rotate-[120deg]"></div>
+            <Link href="/">
+              <span className="text-purple-600">Voice</span>Thingy
+            </Link>
+          </div>
           {[...messages, ...items].filter(Boolean).length > 0 ? (
             <button className="text-sm text-white" onClick={() => setIsTranscriptOpen(!isTranscriptOpen)}>
               Show Transcript
