@@ -121,6 +121,7 @@ export default function () {
    * .appendInputAudio() for each sample
    */
   const startRecording = async () => {
+    driverObj.destroy()
     setIsRecording(true)
     const client = clientRef.current
     const wavRecorder = wavRecorderRef.current
