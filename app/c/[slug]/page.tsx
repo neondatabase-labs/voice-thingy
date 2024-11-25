@@ -411,3 +411,5 @@ export default function () {
     </>
   )
 }
+
+export const runtime = 'edge'
