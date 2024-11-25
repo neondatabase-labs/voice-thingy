@@ -319,12 +319,17 @@ export default function () {
    * Set if the audio is playing per the current track offset
    */
   useEffect(() => {
+    let mountRandomInterval = setInterval(() => {
+      setScale(1 + Math.random() * 0.05)
+    }, 10)
     let mountAudioInterval = setInterval(async () => {
       const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
-      setScale(1 + Math.random() * 0.05)
       setIsAudioPlaying(Boolean(res))
     }, 10)
-    return () => clearInterval(mountAudioInterval)
+    return () => {
+      clearInterval(mountAudioInterval)
+      clearInterval(mountRandomInterval)
+    }
   }, [])
 
   useEffect(() => {
