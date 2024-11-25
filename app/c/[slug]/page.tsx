@@ -78,6 +78,7 @@ export default function () {
     const wavStreamPlayer = wavStreamPlayerRef.current
     startTimeRef.current = new Date().toISOString()
     setIsConnected(true)
+    localStorage.setItem('voice_connected', '1')
     setRealtimeEvents([])
     if (client) setItems(client.conversation.getItems())
     await wavRecorder.begin()
@@ -315,6 +316,7 @@ export default function () {
    * Set if the audio is playing per the current track offset
    */
   useEffect(() => {
+    if (localStorage.getItem('voice_connected') === '1') connectConversation()
     let mountAudioInterval = setInterval(async () => {
       const res = await wavStreamPlayerRef.current.getTrackSampleOffset()
       setIsAudioPlaying(Boolean(res))
