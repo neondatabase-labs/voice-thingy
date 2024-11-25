@@ -12,7 +12,7 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Mic, X } from 'react-feather'
+import { Play, X } from 'react-feather'
 import { toast } from 'sonner'
 
 function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data: Float32Array, color: string, pointCount: number = 0, barWidth: number = 200, barSpacing: number = 2, center: boolean = false) {
@@ -35,10 +35,12 @@ export default function () {
   /**
    * Instantiate:
    * - WavRecorder (speech input)
+   * - Images set (AI, Loading, Speaking) images
    * - WavStreamPlayer (speech output)
    * - RealtimeClient (API client)
    */
   const clientRef = useRef<RealtimeClient>()
+  const [imageUrls, setImageUrls] = useState<any>([])
   const [isAudioPlaying, setIsAudioPlaying] = useState(true)
   const wavRecorderRef = useRef<WavRecorder>(new WavRecorder({ sampleRate: 24000 }))
   const wavStreamPlayerRef = useRef<WavStreamPlayer>(new WavStreamPlayer({ sampleRate: 24000 }))
@@ -327,7 +329,7 @@ export default function () {
     fetch('/api/c?id=' + slug)
       .then((res) => res.json())
       .then((res) => {
-        toast('Loaded conversation history from Neon succesfully.')
+        toast('Loaded conversation history from Neon successfully.')
         if (res.length > 0) {
           setMessages(
             res.map((i: any) => ({
@@ -342,7 +344,49 @@ export default function () {
       })
       .catch(() => toast('Failed to load conversation history :/'))
       .finally(() => {
-        setLoadingMessages(false)
+        const cacheKey1 = 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2djbHhraW4ybmd0a2xrNmswZzcyOXh1cTF2bmd3N2N1bTBqZjN6cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jQS9YkJXofyeI/giphy.webp'
+        const cacheKey2 = 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXp5dzJyc2RxdWhwdWVmMnZmaWxkeDl2bnN0ajF1b3Vnam1sOGlsMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9JxkPTP3alOykb8PmQ/giphy.webp'
+        const cacheKey3 = '/start.png'
+        caches
+          .open('images')
+          .then((cache) => {
+            return Promise.all([
+              cache.match(cacheKey1).then((response) => {
+                if (response) {
+                  return response.blob().then((blob) => URL.createObjectURL(blob))
+                } else {
+                  return fetch(cacheKey1).then((res) => {
+                    cache.put(cacheKey1, res.clone())
+                    return res.blob().then((blob) => URL.createObjectURL(blob))
+                  })
+                }
+              }),
+              cache.match(cacheKey2).then((response) => {
+                if (response) {
+                  return response.blob().then((blob) => URL.createObjectURL(blob))
+                } else {
+                  return fetch(cacheKey2).then((res) => {
+                    cache.put(cacheKey2, res.clone())
+                    return res.blob().then((blob) => URL.createObjectURL(blob))
+                  })
+                }
+              }),
+              cache.match(cacheKey3).then((response) => {
+                if (response) {
+                  return response.blob().then((blob) => URL.createObjectURL(blob))
+                } else {
+                  return fetch(cacheKey3).then((res) => {
+                    cache.put(cacheKey3, res.clone())
+                    return res.blob().then((blob) => URL.createObjectURL(blob))
+                  })
+                }
+              }),
+            ])
+          })
+          .then((urls) => {
+            setImageUrls(urls)
+            setLoadingMessages(false)
+          })
       })
   }, [clientRef.current])
 
@@ -371,29 +415,26 @@ export default function () {
           )}
         </div>
       </header>
-      <div className="mt-8 flex flex-col w-screen items-center justify-center gap-4 min-h-[calc(100vh-120px)] max-w-7xl">
-        {isConnected && (
-          <div className="relative flex flex-col items-center">
-            <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
-            <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
-            <div className={`absolute w-full h-full rounded-full ${isRecording ? 'bg-red-500' : 'bg-blue-500'} transition-all duration-300`} style={{ opacity: isRecording ? 0.5 : 0.3 }} />
-            <div className={`absolute w-full h-full rounded-full border-4 ${isRecording ? 'border-red-800' : 'border-blue-800'} animate-pulse`} />
-            <button
-              onMouseUp={stopRecording}
-              onMouseDown={startRecording}
-              disabled={allowTheButton || !isConnected || isAudioPlaying}
-              className={`relative z-50 flex items-center justify-center rounded-full w-24 h-24 ${isRecording ? 'bg-red-600' : 'bg-blue-600'} transition-all duration-300`}
-            >
-              <span className="text-white text-lg">{isRecording ? 'Recording...' : 'Hold to Talk'}</span>
-            </button>
-          </div>
-        )}
+      <div className="flex flex-col w-screen items-center justify-center gap-4 min-h-[calc(100vh-120px)] max-w-7xl">
+        <div className="relative flex flex-col items-center">
+          {/* <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
+          <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} /> */}
+          <button className={clsx('appearance-none', !isConnected && 'hidden')} onMouseUp={stopRecording} onMouseDown={startRecording} disabled={allowTheButton || isAudioPlaying}>
+            {isRecording ? (
+              <img decoding="async" src={imageUrls[0]} fetchPriority="high" className="rounded-full size-[250px]" />
+            ) : isAudioPlaying ? (
+              <img decoding="async" src={imageUrls[1]} fetchPriority="high" className="rounded-full size-[250px]" />
+            ) : (
+              <img decoding="async" className="rounded-full size-[250px]" fetchPriority="high" src={imageUrls[2]} />
+            )}
+          </button>
+        </div>
         <Button
           disabled={loadingMessages}
-          icon={isConnected ? X : Mic}
+          icon={isConnected ? X : Play}
           iconPosition={isConnected ? 'end' : 'start'}
           onClick={isConnected ? disconnectConversation : connectConversation}
-          label={isConnected ? 'End the conversation' : 'Start the conversation'}
+          label={isConnected ? 'End the conversation' : 'Start a conversation'}
           buttonStyle={isConnected ? 'border border-red-500 text-xs text-red-500' : 'bg-[#00e599] text-black'}
         />
       </div>
