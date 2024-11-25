@@ -402,9 +402,9 @@ export default function () {
           {isConnected && (
             <button onMouseUp={stopRecording} onTouchEnd={stopRecording} onMouseDown={startRecording} onTouchStart={startRecording} onTouchCancel={stopRecording} onContextMenu={(e) => e.preventDefault()} disabled={allowTheButton || isAudioPlaying}>
               {isRecording || isAudioPlaying ? (
-                <img decoding="async" className="rounded-full size-[250px]" style={{ transform: `scale(${scale})` }} src={isRecording ? imageUrls[0] : imageUrls[1]} />
+                <img className="touch-none rounded-full size-[250px]" style={{ transform: `scale(${scale})` }} src={isRecording ? imageUrls[0] : imageUrls[1]} />
               ) : (
-                <img className="rounded-full size-[250px]" src={imageUrls[2]} />
+                <img className="touch-none rounded-full size-[250px]" src={imageUrls[2]} />
               )}
             </button>
           )}
