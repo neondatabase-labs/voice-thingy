@@ -12,7 +12,7 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Mic, PlayCircle, Radio, StopCircle, X } from 'react-feather'
+import { Mic, X } from 'react-feather'
 import { toast } from 'sonner'
 
 function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data: Float32Array, color: string, pointCount: number = 0, barWidth: number = 200, barSpacing: number = 2, center: boolean = false) {
@@ -365,14 +365,20 @@ export default function () {
       </header>
       <div className="mt-8 flex flex-col w-screen items-center justify-center gap-4 min-h-[calc(100vh-120px)] max-w-7xl">
         {isConnected && (
-          <Button
-            iconPosition="start"
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={allowTheButton || !isConnected || isAudioPlaying}
-            icon={allowTheButton ? null : isAudioPlaying ? Radio : isRecording ? StopCircle : PlayCircle}
-            buttonStyle={isRecording ? 'bg-red-800 px-8 py-3 text-white' : 'bg-blue-800 px-8 py-3 text-white'}
-            label={allowTheButton ? 'Preparing voice...' : isAudioPlaying ? 'Audio is playing' : isRecording ? 'Stop recording audio' : 'Click to speak'}
-          />
+          <div className="relative flex flex-col items-center">
+            <canvas className={clsx('h-[150px] w-[300px] absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
+            <canvas className={clsx('h-[150px] w-[300px] absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
+            <div className={`absolute w-full h-full rounded-full ${isRecording ? 'bg-red-500' : 'bg-blue-500'} transition-all duration-300`} style={{ opacity: isRecording ? 0.5 : 0.3 }} />
+            <div className={`absolute w-full h-full rounded-full border-4 ${isRecording ? 'border-red-800' : 'border-blue-800'} animate-pulse`} />
+            <button
+              onMouseUp={stopRecording}
+              onMouseDown={startRecording}
+              disabled={allowTheButton || !isConnected || isAudioPlaying}
+              className={`relative z-50 flex items-center justify-center rounded-full w-24 h-24 ${isRecording ? 'bg-red-600' : 'bg-blue-600'} transition-all duration-300`}
+            >
+              <span className="text-white text-lg">{isRecording ? 'Recording...' : 'Hold to Talk'}</span>
+            </button>
+          </div>
         )}
         <Button
           disabled={loadingMessages}
@@ -382,12 +388,6 @@ export default function () {
           label={isConnected ? 'End the conversation' : 'Start the conversation'}
           buttonStyle={isConnected ? 'border border-red-500 text-xs text-red-500' : 'bg-[#00e599] text-black'}
         />
-        <div className="flex flex-col items-center gap-y-2 min-w-[150px] min-h-[300px]">
-          <canvas className={clsx('flex flex-col', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
-          <span className={clsx('flex flex-col', (!isConnected || !isRecording) && 'hidden')}>You</span>
-          <canvas className={clsx('flex flex-col', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} />
-          <span className={clsx('flex flex-col', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')}>AI</span>
-        </div>
       </div>
       {isTranscriptOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
