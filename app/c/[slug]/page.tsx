@@ -1,5 +1,7 @@
 'use client'
 
+export const runtime = 'edge'
+
 import Button from '@/components/Button'
 import Message from '@/components/Message'
 import instructions from '@/lib/instructions'
@@ -458,5 +460,3 @@ export default function () {
     </>
   )
 }
-
-export const runtime = 'edge'
