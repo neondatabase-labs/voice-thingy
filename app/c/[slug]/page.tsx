@@ -10,6 +10,8 @@ import { normalizeArray } from '@/lib/utils'
 import { WavRecorder, WavStreamPlayer } from '@/lib/wavtools/index.js'
 import { RealtimeClient } from '@openai/realtime-api-beta'
 import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -33,6 +35,7 @@ function drawBars(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, data
 
 export default function () {
   const { slug } = useParams<{ slug: string }>()
+  const driverObj = driver()
   /**
    * Instantiate:
    * - WavRecorder (speech input)
@@ -88,16 +91,14 @@ export default function () {
     await wavStreamPlayer.connect()
     if (client) {
       await client.connect()
-      if (messages.length < 1) {
-        client.sendUserMessageContent([
-          {
-            type: `input_text`,
-            text: `Hello!`,
-          },
-        ])
-      }
-      if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
       toast('You ready to chat with AI.')
+      driverObj.highlight({
+        element: '#play_element',
+        popover: {
+          description: 'Hold to start recording your message, release to let AI respond.',
+        },
+      })
+      if (client.getTurnDetectionType() === 'server_vad') await wavRecorder.record((data) => client.appendInputAudio(data.mono))
     } else toast('Failed to prepare chat with AI.')
     setAllowTheButton(false)
   }, [messages, clientRef.current])
@@ -405,12 +406,17 @@ export default function () {
           {/* <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || !isRecording) && 'hidden')} ref={clientCanvasRef} />
           <canvas className={clsx('absolute bottom-0 z-40', (!isConnected || isRecording || !isAudioPlaying) && 'hidden')} ref={serverCanvasRef} /> */}
           {isConnected && (
-            <button onMouseUp={stopRecording} onTouchEnd={stopRecording} onMouseDown={startRecording} onTouchStart={startRecording} onTouchCancel={stopRecording} onContextMenu={(e) => e.preventDefault()} disabled={allowTheButton || isAudioPlaying}>
-              {isRecording || isAudioPlaying ? (
-                <img className="touch-none rounded-full size-[250px]" src={isRecording ? imageUrls[0] : imageUrls[1]} />
-              ) : (
-                <img className="touch-none rounded-full size-[250px]" src={imageUrls[2]} />
-              )}
+            <button
+              id="play_element"
+              onMouseUp={stopRecording}
+              onTouchEnd={stopRecording}
+              onMouseDown={startRecording}
+              onTouchStart={startRecording}
+              onTouchCancel={stopRecording}
+              onContextMenu={(e) => e.preventDefault()}
+              disabled={allowTheButton || isAudioPlaying}
+            >
+              <img className="touch-none rounded-full size-[250px]" src={isRecording ? imageUrls[0] : isAudioPlaying ? imageUrls[1] : imageUrls[2]} />
             </button>
           )}
         </div>
