@@ -11,20 +11,23 @@ const interFont = Inter({
   display: 'swap',
 })
 
+const btoa = (str: string) => Buffer.from(str).toString('base64')
+const images = `https://neon.tech/docs/og?title=${btoa(config.title)}&breadcrumb=${btoa('AI')}`
+
 export const metadata: Metadata = {
   title: config.title,
   description: config.description,
   openGraph: {
+    images,
+    url: config.url,
     title: config.title,
     description: config.description,
-    url: config.url,
-    images: `https://neon.tech/docs/og?title=${btoa(config.title)}&breadcrumb=${btoa('AI')}`,
   },
   twitter: {
-    card: 'summary_large_image',
+    images,
     title: config.title,
+    card: 'summary_large_image',
     description: config.description,
-    images: `https://neon.tech/docs/og?title=${btoa(config.title)}&breadcrumb=${btoa('AI')}`,
   },
 }
 
