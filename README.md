@@ -1,8 +1,8 @@
-<a href="https://voice-thingy.vercel.app">
+<a href="https://voice-thingy-with-braintrust-neon.vercel.app">
   <img alt="Voice Thingy" src="https://neon.tech/docs/og?title=Vm9pY2UgVGhpbmd5&amp;breadcrumb=QUk=">  
 </a>
 
-<a href="https://voice-thingy.vercel.app">
+<a href="https://voice-thingy-with-braintrust-neon.vercel.app">
   <h1 align="center">Voice Thingy</h1>
 </a>
 
@@ -19,7 +19,7 @@
 
 ## Cloning & running
 
-1. Clone the repo: `git clone https://github.com/neondatabase-labs/voice-thingy`
+1. Clone the repo: `git clone https://github.com/neondatabase-labs/voice-thingy-with-braintrust-neon`
 2. Create a `.env` file and add the following environment variables:
 
 ```

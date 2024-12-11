@@ -27,7 +27,7 @@ export default function () {
           <Link href="https://x.com/neondatabase" target="_blank" className="group">
             <Twitter className="size-4 group-hover:fill-gray-200" />
           </Link>
-          <Link href="https://github.com/neondatabase-labs/voice-thingy" target="_blank" className="group">
+          <Link href="https://github.com/neondatabase-labs/voice-thingy-with-braintrust-neon" target="_blank" className="group">
             <GitHub className="size-4 group-hover:fill-gray-200" />
           </Link>
         </div>

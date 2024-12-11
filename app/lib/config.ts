@@ -1,6 +1,6 @@
 export default {
   name: 'Neon',
-  url: 'https://voice-thingy.vercel.app',
+  url: 'https://voice-thingy-with-braintrust-neon.vercel.app',
   logo: 'https://neon.tech/brand/neon-logo-dark-color.svg',
   title: 'Voice Thingy',
   description: 'Voice led interactions with AI.',
