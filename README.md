@@ -1,5 +1,5 @@
 <a href="https://voice-thingy-with-braintrust-neon.vercel.app">
-  <img alt="Voice Thingy" src="https://neon.tech/docs/og?title=Vm9pY2UgVGhpbmd5&amp;breadcrumb=QUk=">  
+  <img alt="Voice Thingy" src="https://neon.tech/docs/og?title=Vm9pY2UgbGVkIGludGVyYWN0aW9ucyB3aXRoIEFJIChwb3dlcmVkIGJ5IEJyYWludHJ1c3Qp&amp;breadcrumb=QUk=">  
 </a>
 
 <a href="https://voice-thingy-with-braintrust-neon.vercel.app">
